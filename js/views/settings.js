@@ -93,9 +93,12 @@
       OB.store.commit();
       OB.router.refresh();
     });
-    // Language field: globe icon + native word + the universal English word
-    // "Language" so a visitor in any locale can recognise it at a glance.
-    const langLabel = "🌐 " + t("language") + (OB.i18n.getLocale() === "en" ? "" : " · Language");
+    // Language field: globe icon (line SVG, not emoji) + native word + the
+    // universal English word "Language" so any visitor can recognise it.
+    const langLabel = el("span", {}, [
+      el("span", { html: OB.icon("globe", 14), style: "margin-right:4px;vertical-align:-2px;display:inline-block" }),
+      document.createTextNode(t("language") + (OB.i18n.getLocale() === "en" ? "" : " · Language")),
+    ]);
     main.appendChild(el("div", { class: "field-row" }, [OB.ui.field(t("currency"), curSel), OB.ui.field(langLabel, langSel)]));
 
     // theme
@@ -159,7 +162,7 @@
 
     // --- receipt-engine (optional, only when the receipt module is loaded) ---
     if (window.OB && OB.receipt && typeof OB.receipt.openSettings === "function") {
-      main.appendChild(el("h2", { class: "section-title", text: "🧾 " + t("receipt_section") }));
+      main.appendChild(el("h2", { class: "section-title", html: OB.icon("receipt", 15) + " " + esc(t("receipt_section")) }));
       const hasTpl = typeof OB.receipt.getTemplate === "function" && !!OB.receipt.getTemplate();
       const statusLine = el("div", { class: "field-hint", style: "color:" + (hasTpl ? "var(--success)" : "var(--text-muted)") + ";margin-bottom:8px",
         text: hasTpl ? t("receipt_template_loaded") : t("receipt_template_not_loaded") });
@@ -222,7 +225,7 @@
         toast(t("imported"), "success");
         OB.router.go("home");
       } catch (e) {
-        toast("⚠ " + e.message, "danger");
+        toast(e.message, "danger");
       }
     }
     function exportShare() {

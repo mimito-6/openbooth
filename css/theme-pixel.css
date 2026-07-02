@@ -553,3 +553,98 @@
 [data-theme="pixel"] .summary-row.total {
   border-top: 2px solid var(--accent);
 }
+
+/* ===== V3 BOLD HOME LAYOUT — garment care label ===== */
+/* Home becomes one printed label sheet: brand block up top (already framed
+   by the hero panel), nav turns into single-column CARE-LABEL ROWS with
+   right-aligned _0N codes, and the stats data block drops to the bottom of
+   the label. Uses :has(); older engines keep the stacked fallback. */
+[data-theme="pixel"] .view.active:has(> .home-hero) {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "hero"
+    "cta"
+    "nav"
+    "stats";
+  padding: 0 16px;
+  max-width: 560px;
+  margin: 0 auto;
+}
+[data-theme="pixel"] .view.active:has(> .home-hero) .home-hero {
+  grid-area: hero;
+}
+[data-theme="pixel"] .view.active:has(> .home-hero) .open-stall-btn {
+  grid-area: cta;
+  width: 100%;
+  margin: 14px 0 4px;
+}
+[data-theme="pixel"] .view.active:has(> .home-hero) .nav-grid {
+  grid-area: nav;
+  padding: 14px 0 6px;
+  max-width: none;
+}
+[data-theme="pixel"] .view.active:has(> .home-hero) > div:has(> .stats) {
+  grid-area: stats;
+  padding: 4px 0 26px;
+  max-width: none;
+}
+/* nav -> care-label rows: icon · name ······ _0N */
+[data-theme="pixel"] .nav-grid {
+  grid-template-columns: 1fr;
+  gap: 7px;
+}
+[data-theme="pixel"] .nav-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+  padding: 13px 16px;
+  min-height: 52px;
+}
+[data-theme="pixel"] .nav-card .nav-emoji.nav-ico {
+  margin: 0;
+}
+[data-theme="pixel"] .nav-card .nav-emoji.nav-ico .ob-ico {
+  width: 21px;
+  height: 21px;
+}
+[data-theme="pixel"] .nav-card .nav-name {
+  font-size: 15px;
+}
+/* the _0N counter moves inline to the row end */
+[data-theme="pixel"] .nav-card::after {
+  position: static;
+  grid-column: 3;
+  justify-self: end;
+}
+[data-theme="pixel"] .nav-card .nav-badge {
+  position: static;
+  grid-column: 3;
+  justify-self: end;
+}
+/* stats -> bottom data strip of the label */
+[data-theme="pixel"] .stats {
+  border: 2px solid var(--text);
+  gap: 0;
+  background: var(--surface);
+}
+[data-theme="pixel"] .stat {
+  border: none;
+  border-right: 1.5px solid var(--border-strong);
+  border-radius: 0;
+  box-shadow: none;
+}
+[data-theme="pixel"] .stat:last-child {
+  border-right: none;
+}
+
+/* fix: auto side-margins on grid items absorb free space and shrink them
+   to fit-content — force full-width inside the bold home grid */
+[data-theme="pixel"] .view.active:has(> .home-hero) > div:has(> .stats),
+[data-theme="pixel"] .view.active:has(> .home-hero) .nav-grid {
+  margin: 0;
+  width: 100%;
+  max-width: none;
+}

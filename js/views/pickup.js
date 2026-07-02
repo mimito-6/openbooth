@@ -68,7 +68,7 @@
       if (filter !== "all") items = items.filter((p) => p.status === filter);
       if (search) items = items.filter((p) => (p.customerName + " " + p.itemsText + " " + (p.contact || "")).toLowerCase().includes(search));
       if (!items.length) {
-        listEl.appendChild(OB.ui.emptyState("📋", t("no_preorders")));
+        listEl.appendChild(OB.ui.emptyState("clipboard", t("no_preorders")));
         return;
       }
       items.forEach((p) => listEl.appendChild(row(p)));
@@ -199,7 +199,7 @@
             el("a", { href: "#", style: "color:var(--accent);font-size:12px;text-decoration:none", onclick: (e) => { e.preventDefault(); sh.close(); OB.router.go("settings"); toast(t("edit_in_settings"), ""); } }, [document.createTextNode(t("edit_template") + " →")]),
           ]),
           previewBox,
-          el("button", { class: "btn btn-secondary btn-block btn-sm", style: "margin-top:8px", text: "📋 " + t("copy_notify"), onclick: () => copyText(previewBox.textContent).then(() => toast(t("copied"), "success")) }),
+          el("button", { class: "btn btn-secondary btn-block btn-sm", style: "margin-top:8px", html: OB.icon("copy", 15) + " " + esc(t("copy_notify")), onclick: () => copyText(previewBox.textContent).then(() => toast(t("copied"), "success")) }),
         ])
       );
     }

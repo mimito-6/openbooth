@@ -448,3 +448,114 @@
     display: none;
   }
 }
+
+/* ===== V3 BOLD HOME LAYOUT — silver poster ===== */
+/* Home reads like the exhibition poster: small ink mark top-left, giant
+   light-weight display name, quiet meta, then data pills. Uses :has();
+   older engines keep the stacked fallback. */
+[data-theme="halftone"] .view.active:has(> .home-hero) {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "mascot chip"
+    "title title"
+    "event event"
+    "stats stats"
+    "cta cta"
+    "nav nav";
+  padding: 14px 18px 0;
+  max-width: 560px;
+  margin: 0 auto;
+}
+[data-theme="halftone"] .view.active:has(> .home-hero) .home-hero {
+  display: contents;
+}
+[data-theme="halftone"] .view.active:has(> .home-hero) .home-mascot-fallback,
+[data-theme="halftone"] .view.active:has(> .home-hero) .home-mascot {
+  grid-area: mascot;
+  justify-self: start;
+  margin: 0;
+}
+[data-theme="halftone"] .view.active:has(> .home-hero) .home-mascot-fallback svg {
+  width: 44px;
+  height: 44px;
+  fill: var(--text) !important;
+}
+[data-theme="halftone"] .view.active:has(> .home-hero) .ready-chip {
+  grid-area: chip;
+  justify-self: end;
+  align-self: start;
+  margin: 0;
+}
+[data-theme="halftone"] .view.active:has(> .home-hero) .home-shop-name {
+  grid-area: title;
+  text-align: left;
+  font-size: 42px;
+  font-weight: 300;
+  line-height: 1.04;
+  color: var(--text-secondary);
+  margin-top: 18px;
+  overflow-wrap: anywhere;
+}
+[data-theme="halftone"] .view.active:has(> .home-hero) .home-event-line {
+  grid-area: event;
+  text-align: left;
+  margin-top: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-strong);
+}
+[data-theme="halftone"] .view.active:has(> .home-hero) > div:has(> .stats) {
+  grid-area: stats;
+  padding: 16px 0 0;
+  max-width: none;
+}
+[data-theme="halftone"] .view.active:has(> .home-hero) .open-stall-btn {
+  grid-area: cta;
+  width: 100%;
+  margin: 16px 0 4px;
+}
+[data-theme="halftone"] .view.active:has(> .home-hero) .nav-grid {
+  grid-area: nav;
+  padding: 14px 0 24px;
+  max-width: none;
+}
+/* data pills: numerals go big & light, the poster's blue-dates motif */
+[data-theme="halftone"] .stat-value {
+  font-weight: 300;
+  font-size: 27px;
+  letter-spacing: -0.01em;
+}
+/* nav: two tall pills per row with bigger circled arrows */
+[data-theme="halftone"] .nav-grid {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+[data-theme="halftone"] .nav-card {
+  padding: 22px 14px 30px;
+}
+
+/* --- material push: denser halftone + brighter metal ramp --- */
+[data-theme="halftone"] body {
+  background: linear-gradient(175deg, #f0f2f6 0%, #d6d9e0 46%, #e6e8ee 72%, #c9ccd4 100%);
+}
+[data-theme="halftone"] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 6;
+  opacity: 0.85;
+  background-image: radial-gradient(circle, rgba(35, 38, 44, 0.16) 1px, transparent 1.4px);
+  background-size: 6px 6px;
+  -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.25) 34%, rgba(0, 0, 0, 0.12) 55%, rgba(0, 0, 0, 0.75) 100%);
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.25) 34%, rgba(0, 0, 0, 0.12) 55%, rgba(0, 0, 0, 0.75) 100%);
+}
+
+/* fix: auto side-margins on grid items absorb free space and shrink them
+   to fit-content — force full-width inside the bold home grid */
+[data-theme="halftone"] .view.active:has(> .home-hero) > div:has(> .stats),
+[data-theme="halftone"] .view.active:has(> .home-hero) .nav-grid {
+  margin: 0;
+  width: 100%;
+  max-width: none;
+}

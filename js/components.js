@@ -43,8 +43,16 @@
     return row;
   }
 
-  function emptyState(emoji, text) {
-    return el("div", { class: "empty-state" }, [el("span", { class: "emoji", text: emoji || "📦" }), el("div", { text: text || "" })]);
+  function emptyState(icon, text) {
+    // Accepts an OB.icon name ("box","search",...); legacy emoji args are
+    // mapped so old callers keep working. Renders a line-SVG, never an emoji.
+    const legacy = { "\u{1F4E6}": "box", "\u{1F4CB}": "clipboard", "\u{1F9FE}": "receipt", "\u{1F50D}": "search" };
+    const name = legacy[icon] || icon || "box";
+    const svg = window.OB && OB.icon ? OB.icon(name, 38) : "";
+    const iconNode = svg && svg.indexOf("<svg") === 0
+      ? el("span", { class: "emoji", html: svg })
+      : el("span", { class: "emoji", text: icon || "" });
+    return el("div", { class: "empty-state" }, [iconNode, el("div", { text: text || "" })]);
   }
 
   // Bottom sheet. Returns { root, body, footer, close }
@@ -85,7 +93,11 @@
   }
 
   function field(labelText, inputNode, hint) {
-    const f = el("div", { class: "field" }, [el("label", { text: labelText }), inputNode]);
+    // labelText may be a string or a prepared Node (e.g. icon + text)
+    const label = el("label");
+    if (labelText && labelText.nodeType) label.appendChild(labelText);
+    else label.textContent = labelText || "";
+    const f = el("div", { class: "field" }, [label, inputNode]);
     if (hint) f.appendChild(el("div", { class: "field-hint", text: hint }));
     return f;
   }

@@ -521,3 +521,151 @@
     transition: none;
   }
 }
+
+/* ===== V3 BOLD HOME LAYOUT — technical document ===== */
+/* Home becomes the spec-sheet: full-width orange document bar on top (the
+   ready-chip, repurposed), giant stacked ink title with orange crop
+   brackets, stats as a ruled spec TABLE, orange CTA bar. Uses :has();
+   older engines keep the stacked fallback. */
+[data-theme="spec"] .view.active:has(> .home-hero) {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "docbar docbar"
+    "title title"
+    "event mascot"
+    "cta cta"
+    "stats stats"
+    "nav nav";
+  padding: 0 16px;
+  max-width: 560px;
+  margin: 0 auto;
+}
+[data-theme="spec"] .view.active:has(> .home-hero) .home-hero {
+  display: contents;
+}
+/* ready-chip -> the top orange document bar */
+[data-theme="spec"] .view.active:has(> .home-hero) .ready-chip {
+  grid-area: docbar;
+  justify-self: stretch;
+  display: flex;
+  justify-content: center;
+  border-radius: 0;
+  border: 2px solid var(--text);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 700;
+  padding: 8px 12px;
+  margin: 10px 0 4px;
+  box-shadow: none;
+}
+[data-theme="spec"] .view.active:has(> .home-hero) .ready-chip .dot {
+  background: var(--on-accent);
+}
+[data-theme="spec"] .view.active:has(> .home-hero) .ready-chip::before {
+  content: "SPEC · POS ";
+  letter-spacing: 0.12em;
+  font-size: 10px;
+  margin-right: auto;
+}
+[data-theme="spec"] .view.active:has(> .home-hero) .ready-chip::after {
+  content: " AD-47";
+  letter-spacing: 0.12em;
+  font-size: 10px;
+  margin-left: auto;
+}
+/* giant stacked ink title framed by orange crop brackets */
+[data-theme="spec"] .view.active:has(> .home-hero) .home-shop-name {
+  grid-area: title;
+  position: relative;
+  text-align: left;
+  font-size: 38px;
+  line-height: 1.04;
+  font-weight: 400; /* Archivo Black carries the weight */
+  padding: 18px 10px 14px;
+  margin-top: 8px;
+  overflow-wrap: anywhere;
+}
+[data-theme="spec"] .view.active:has(> .home-hero) .home-shop-name::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 26px;
+  height: 26px;
+  border-left: 3px solid var(--accent);
+  border-top: 3px solid var(--accent);
+}
+[data-theme="spec"] .view.active:has(> .home-hero) .home-shop-name::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 26px;
+  height: 26px;
+  border-right: 3px solid var(--accent);
+  border-bottom: 3px solid var(--accent);
+}
+[data-theme="spec"] .view.active:has(> .home-hero) .home-event-line {
+  grid-area: event;
+  text-align: left;
+  margin: 4px 0 0 2px;
+}
+[data-theme="spec"] .view.active:has(> .home-hero) .home-mascot-fallback,
+[data-theme="spec"] .view.active:has(> .home-hero) .home-mascot {
+  grid-area: mascot;
+  align-self: center;
+  margin: 0;
+}
+[data-theme="spec"] .view.active:has(> .home-hero) .home-mascot-fallback svg {
+  width: 40px;
+  height: 40px;
+  fill: var(--text) !important;
+}
+[data-theme="spec"] .view.active:has(> .home-hero) .open-stall-btn {
+  grid-area: cta;
+  width: 100%;
+  margin: 14px 0 4px;
+}
+[data-theme="spec"] .view.active:has(> .home-hero) > div:has(> .stats) {
+  grid-area: stats;
+  padding: 12px 0 0;
+  max-width: none;
+}
+[data-theme="spec"] .view.active:has(> .home-hero) .nav-grid {
+  grid-area: nav;
+  padding: 14px 0 24px;
+  max-width: none;
+}
+/* stats -> ruled spec table rows (label left, huge value right) */
+[data-theme="spec"] .stats {
+  grid-template-columns: 1fr;
+  gap: 0;
+  border: 2px solid var(--text);
+  background: var(--surface);
+}
+[data-theme="spec"] .stat {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  box-shadow: none;
+  padding: 10px 14px;
+}
+[data-theme="spec"] .stat:last-child {
+  border-bottom: none;
+}
+[data-theme="spec"] .stat-value {
+  font-size: 24px;
+}
+
+/* fix: auto side-margins on grid items absorb free space and shrink them
+   to fit-content — force full-width inside the bold home grid */
+[data-theme="spec"] .view.active:has(> .home-hero) > div:has(> .stats),
+[data-theme="spec"] .view.active:has(> .home-hero) .nav-grid {
+  margin: 0;
+  width: 100%;
+  max-width: none;
+}

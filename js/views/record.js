@@ -68,16 +68,16 @@
     // transaction list
     const sec = el("section", { class: "section" }, [el("h2", { class: "section-title", text: t("records") })]);
     if (!txs.length) {
-      sec.appendChild(OB.ui.emptyState("🧾", t("no_records")));
+      sec.appendChild(OB.ui.emptyState("receipt", t("no_records")));
     } else {
       txs.forEach((tx) => {
-        const parts = (tx.lines || []).map((l) => l.name + "×" + l.qty + (l.isTokuten ? "🎁" : ""));
+        const parts = (tx.lines || []).map((l) => l.name + "×" + l.qty + (l.isTokuten ? "✦" : ""));
         const row = el("div", { class: "list-row" });
         row.appendChild(
           el("div", { class: "list-main" }, [
             el("div", { class: "list-sub", text: fmtTime(tx.time) + " · " + (tx.paymentMethodName || "") }),
             el("div", { class: "list-title", style: "font-weight:600;font-size:13px;line-height:1.4", text: parts.join("・") || "—" }),
-            tx.giftNote ? el("div", { class: "list-sub", text: "🎁 " + tx.giftNote }) : null,
+            tx.giftNote ? el("div", { class: "list-sub", html: OB.icon("gift", 13) + " " + esc(tx.giftNote) }) : null,
           ])
         );
         row.appendChild(
@@ -94,7 +94,7 @@
     if (txs.length) {
       main.appendChild(
         el("div", { style: "padding:8px 0 24px" }, [
-          el("button", { class: "btn btn-secondary btn-block", style: "color:var(--danger)", text: "⚠ " + t("reset_records"), onclick: resetRecords }),
+          el("button", { class: "btn btn-secondary btn-block", style: "color:var(--danger)", html: OB.icon("alert", 15) + " " + esc(t("reset_records")), onclick: resetRecords }),
         ])
       );
     }
@@ -226,7 +226,7 @@
 
     // gifts given
     if (stats.giftsGiven) {
-      sh.body.appendChild(el("div", { class: "summary-row", style: "margin-top:8px" }, [el("span", { text: "🎁 " + t("gift_given") }), el("span", { text: stats.giftsGiven + t("unit_pcs") })]));
+      sh.body.appendChild(el("div", { class: "summary-row", style: "margin-top:8px" }, [el("span", { html: OB.icon("gift", 14) + " " + esc(t("gift_given")) }), el("span", { text: stats.giftsGiven + t("unit_pcs") })]));
     }
 
     // remaining stock
@@ -234,7 +234,7 @@
     OB.store.activeProducts().forEach((p) => {
       const rem = OB.inventory.committedRemaining(st, p.id);
       if (!isFinite(rem)) return;
-      sh.body.appendChild(el("div", { class: "summary-row" }, [el("span", { text: p.name }), el("span", { class: rem <= 0 ? "" : "", text: (rem <= 0 ? "✅ " : "") + Math.max(0, rem) })]));
+      sh.body.appendChild(el("div", { class: "summary-row" }, [el("span", { text: p.name }), el("span", { text: (rem <= 0 ? "✓ " : "") + Math.max(0, rem) })]));
     });
 
     function row(label, val, strong) {

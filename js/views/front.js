@@ -149,7 +149,7 @@
       if (!prods.length && !combos.length) {
         const hasAny = OB.store.activeProducts().length > 0;
         const box = el("div", { style: "grid-column:1/-1" });
-        box.appendChild(hasAny ? OB.ui.emptyState("🔍", "—") : OB.ui.emptyState("📦", t("no_products")));
+        box.appendChild(hasAny ? OB.ui.emptyState("search", "—") : OB.ui.emptyState("box", t("no_products")));
         if (!hasAny) {
           box.appendChild(el("button", { class: "btn btn-primary btn-block", text: "＋ " + t("add_product"), onclick: () => OB.router.go("stock") }));
         }
@@ -331,7 +331,7 @@
       if (s.discount > 0) sh.footer.appendChild(summaryRow(t("discount"), "−" + fmtMoney(s.discount), "saved"));
       sh.footer.appendChild(summaryRow(t("total_due"), fmtMoney(s.grandTotal), "total"));
 
-      const adjustBtn = el("button", { class: "mini-btn", style: "margin-top:8px", text: "🧮 " + t("manual_adjust"), onclick: roundTotal });
+      const adjustBtn = el("button", { class: "mini-btn", style: "margin-top:8px", html: OB.icon("calculator", 15) + " " + esc(t("manual_adjust")), onclick: roundTotal });
       sh.footer.appendChild(el("div", {}, [adjustBtn]));
 
       sh.footer.appendChild(
@@ -406,7 +406,7 @@
         el("button", {
           class: "mini-btn",
           style: "margin:10px auto;display:block",
-          text: "📱 " + t("customer_display"),
+          html: OB.icon("smartphone", 15) + " " + esc(t("customer_display")),
           onclick: () => OB.app.showCustomerDisplay(s.grandTotal, isCash ? null : chosenPayment && chosenPayment.qr),
         })
       );

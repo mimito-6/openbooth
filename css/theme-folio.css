@@ -418,3 +418,148 @@
     linear-gradient(to bottom, rgba(38, 83, 232, 0.045) 1px, transparent 1px);
   background-size: 26px 26px;
 }
+
+/* ===== V3 BOLD HOME LAYOUT — editorial catalog page ===== */
+/* Home becomes a left-aligned editorial page: huge cobalt title, meta chip
+   top-right, then the nav grid turns into the reference's numbered CATALOG
+   list (active row = solid cobalt). Uses :has(); older engines keep the
+   default stacked layout gracefully. */
+[data-theme="folio"] .view.active:has(> .home-hero) {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "chip chip"
+    "title mascot"
+    "event mascot"
+    "cta cta"
+    "stats stats"
+    "nav nav";
+  padding: 10px 16px 0;
+  max-width: 560px;
+  margin: 0 auto;
+  column-gap: 12px;
+}
+[data-theme="folio"] .view.active:has(> .home-hero) .home-hero {
+  display: contents;
+}
+[data-theme="folio"] .view.active:has(> .home-hero) .home-shop-name {
+  grid-area: title;
+  text-align: left;
+  font-size: 40px;
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  color: var(--accent);
+  font-weight: 700;
+  padding-top: 6px;
+  overflow-wrap: anywhere;
+}
+[data-theme="folio"] .view.active:has(> .home-hero) .home-event-line {
+  grid-area: event;
+  text-align: left;
+  margin-top: 6px;
+  color: var(--text-secondary);
+}
+[data-theme="folio"] .view.active:has(> .home-hero) .home-event-line::before {
+  content: "( ";
+  color: var(--accent);
+}
+[data-theme="folio"] .view.active:has(> .home-hero) .home-event-line::after {
+  content: " )";
+  color: var(--accent);
+}
+[data-theme="folio"] .view.active:has(> .home-hero) .home-mascot-fallback,
+[data-theme="folio"] .view.active:has(> .home-hero) .home-mascot {
+  grid-area: mascot;
+  align-self: start;
+  margin: 6px 0 0;
+}
+[data-theme="folio"] .view.active:has(> .home-hero) .home-mascot-fallback svg {
+  width: 56px;
+  height: 56px;
+}
+[data-theme="folio"] .view.active:has(> .home-hero) .ready-chip {
+  grid-area: chip;
+  justify-self: end;
+  margin: 0;
+}
+[data-theme="folio"] .view.active:has(> .home-hero) .open-stall-btn {
+  grid-area: cta;
+  width: 100%;
+  margin: 18px 0 6px;
+}
+[data-theme="folio"] .view.active:has(> .home-hero) > div:has(> .stats) {
+  grid-area: stats;
+  padding: 10px 0 0;
+  max-width: none;
+}
+[data-theme="folio"] .view.active:has(> .home-hero) .nav-grid {
+  grid-area: nav;
+  padding: 14px 0 24px;
+  max-width: none;
+}
+
+/* --- nav grid -> numbered catalog rows (the reference's 目录 block) --- */
+[data-theme="folio"] .nav-grid {
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+[data-theme="folio"] .nav-card {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+  padding: 13px 16px;
+}
+/* the folder tab reads wrong on rows — number badge carries the identity */
+[data-theme="folio"] .nav-card::before {
+  display: none;
+}
+[data-theme="folio"] .nav-card::after {
+  position: static;
+  order: -1;
+  content: "0" counter(folio-nav);
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--accent);
+  opacity: 0.9;
+  min-width: 34px;
+}
+[data-theme="folio"] .nav-card .nav-emoji.nav-ico {
+  margin: 0;
+}
+[data-theme="folio"] .nav-card .nav-emoji.nav-ico .ob-ico {
+  width: 22px;
+  height: 22px;
+}
+[data-theme="folio"] .nav-card .nav-name {
+  font-size: 15.5px;
+}
+/* trailing arrow, like the catalog's row affordance */
+[data-theme="folio"] .nav-card .nav-name::after {
+  content: " →";
+  color: var(--accent);
+  font-weight: 700;
+}
+[data-theme="folio"] .nav-card:active .nav-name::after {
+  color: var(--on-accent);
+}
+[data-theme="folio"] .nav-card:active::after {
+  color: var(--on-accent);
+}
+/* badge sits inline on rows */
+[data-theme="folio"] .nav-card .nav-badge {
+  position: static;
+  grid-column: 4;
+  justify-self: end;
+}
+
+/* fix: auto side-margins on grid items absorb free space and shrink them
+   to fit-content — force full-width inside the bold home grid */
+[data-theme="folio"] .view.active:has(> .home-hero) > div:has(> .stats),
+[data-theme="folio"] .view.active:has(> .home-hero) .nav-grid {
+  margin: 0;
+  width: 100%;
+  max-width: none;
+}

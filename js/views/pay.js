@@ -24,7 +24,7 @@
       .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
       .forEach((m) => {
         const row = el("div", { class: "list-row", onclick: () => edit(m) });
-        row.appendChild(el("div", { class: "list-thumb", text: m.type === "cash" ? "💵" : "💳" }));
+        row.appendChild(el("div", { class: "list-thumb", html: OB.icon(m.type === "cash" ? "banknote" : "credit-card", 22) }));
         row.appendChild(
           el("div", { class: "list-main" }, [
             el("div", { class: "list-title" }, [

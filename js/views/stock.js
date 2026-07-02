@@ -15,7 +15,7 @@
       OB.ui.header({
         title: t("nav_stock"),
         onBack: () => OB.router.go("home"),
-        right: [{ icon: "🏷️", label: t("manage_categories"), onClick: openCategories }],
+        right: [{ icon: OB.icon("tag"), label: t("manage_categories"), onClick: openCategories }],
       })
     );
 
@@ -33,7 +33,7 @@
     const prods = OB.store.activeProducts();
     const archived = st.products.filter((p) => p.archived);
     if (!prods.length && !archived.length) {
-      main.appendChild(OB.ui.emptyState("📦", t("no_products")));
+      main.appendChild(OB.ui.emptyState("box", t("no_products")));
     } else {
       const listSec = el("section", { class: "section" }, [el("h2", { class: "section-title", text: t("nav_stock") })]);
       prods.forEach((p) => listSec.appendChild(productRow(p)));
@@ -59,7 +59,7 @@
       const cat = st.categories.find((c) => c.id === p.categoryId);
       const thumb = p.image
         ? el("img", { class: "list-thumb", src: p.image, alt: "" })
-        : el("div", { class: "list-thumb", text: "🏷️" });
+        : el("div", { class: "list-thumb", html: OB.icon("tag", 22) });
       const sub = (cat ? cat.name + " · " : "") + t("stock_label") + " " + (isFinite(rem) ? Math.max(0, rem) : "∞") + " · " + t("sold_label") + " " + sold;
       return el("div", { class: "list-row", onclick: () => editProduct(p) }, [
         thumb,
@@ -74,7 +74,7 @@
         return (p ? p.name : "?") + "×" + u.qty;
       });
       return el("div", { class: "list-row", onclick: () => editCombo(c) }, [
-        el("div", { class: "list-thumb", text: "🎁" }),
+        el("div", { class: "list-thumb", html: OB.icon("gift", 22) }),
         el("div", { class: "list-main" }, [el("div", { class: "list-title", text: c.name }), el("div", { class: "list-sub", text: parts.join(" + ") })]),
         el("div", { class: "list-end" }, [el("div", { class: "list-amount", text: fmtMoney(c.price) })]),
       ]);

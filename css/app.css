@@ -145,6 +145,19 @@ button {
 .ob-ico {
   display: block;
 }
+/* icons sitting inside text lines (buttons, labels, list thumbs) flow inline */
+button .ob-ico,
+label .ob-ico,
+.list-thumb .ob-ico,
+.section-title .ob-ico,
+.list-sub .ob-ico {
+  display: inline-block;
+  vertical-align: -3px;
+}
+.list-thumb .ob-ico {
+  vertical-align: middle;
+  color: var(--accent);
+}
 .icon-btn .ob-ico {
   width: 22px;
   height: 22px;
