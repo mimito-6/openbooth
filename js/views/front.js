@@ -503,9 +503,14 @@
       if (OB.router.current() === "front" && OB.app.frontUpdate) OB.app.frontUpdate();
       toast(t("sale_done", { amount: fmtMoney(s.grandTotal) }), "success");
       printFlourish(fmtMoney(s.grandTotal));
-      if (st2.settings.showReceipt) setTimeout(() => showReceipt(savedTx), 300);
-      // receipt-engine: render + thermal-print / share the receipt
-      if (window.OB && OB.receipt) setTimeout(() => OB.receipt.handle(savedTx), 320);
+      // ONE receipt surface, gated by the single "show receipt" setting:
+      // the receipt engine (print/share/download) when loaded, otherwise the
+      // built-in thank-you card. Stacking both trapped users under two modals.
+      const hasEngine = window.OB && OB.receipt && typeof OB.receipt.handle === "function";
+      if (st2.settings.showReceipt) {
+        if (hasEngine) setTimeout(() => OB.receipt.handle(savedTx), 320);
+        else setTimeout(() => showReceipt(savedTx), 300);
+      }
     }
 
     renderStep1();

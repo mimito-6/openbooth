@@ -34,6 +34,8 @@
     { id: "zine", dots: ["#c81e56", "#f3efdf", "#2b58c8"] }, // ascii doujin zine
     { id: "spec", dots: ["#e84e14", "#f6f5f1", "#171715"] }, // industrial spec sheet
     { id: "pixel", dots: ["#3a4150", "#e2e5f0", "#949bb0"] }, // techwear pixel label
+    { id: "meido", dots: ["#d9578b", "#fbeff1", "#8a6fb8"] }, // maid-café cute
+    { id: "nothing", dots: ["#d71920", "#f3f2ef", "#1c1c1c"] }, // dot-matrix minimal
   ];
 
   function render(root) {

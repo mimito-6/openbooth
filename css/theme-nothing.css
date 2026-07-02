@@ -1,0 +1,364 @@
+/* ============================================================
+   OpenBooth — Theme "nothing" (dot-matrix minimal)
+   Nothing-OS language: warm-white field, near-black ink, ONE red
+   functional dot, dot-matrix numerals (DotGothic16, Latin subset),
+   dotted hairline separators, bare list rows instead of boxes.
+   All selectors [data-theme="nothing"].
+   ============================================================ */
+
+@font-face {
+  font-family: "DotGothic16";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/dotgothic16-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+2000-206F, U+20AC, U+2122,
+    U+2212, U+FEFF;
+}
+
+/* ===== tokens ===== */
+[data-theme="nothing"] {
+  --bg: #f3f2ef; /* warm paper white */
+  --surface: #fbfaf8;
+  --surface-2: #e9e8e4;
+  --border: #d9d8d3;
+  --border-strong: #1c1c1c;
+  --text: #171717; /* 14.7:1 */
+  --text-secondary: #5c5c58; /* 6.4:1 */
+  --text-muted: #97968f; /* hints only */
+  --accent: #d71920; /* THE red dot — money + primary only */
+  --accent-dark: #b01218;
+  --accent-light: #fbe3e3;
+  --on-accent: #fff7f6;
+  --success: #3d7a4e;
+  --success-light: #e2eee4;
+  --combo: #55555f;
+  --combo-light: #e8e8ee;
+  --danger: #c33a30;
+  --warning: #8f6c1a;
+  --font-display: "DotGothic16", -apple-system, "PingFang TC", "Noto Sans TC", sans-serif;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 22px;
+  --shadow-card: none;
+  --shadow-float: 0 8px 24px rgba(23, 23, 23, 0.14);
+  --shadow-sheet: 0 -8px 28px rgba(23, 23, 23, 0.12);
+}
+
+/* dot-matrix numerals on money/data; body text stays clean system sans */
+[data-theme="nothing"] .stat-value,
+[data-theme="nothing"] .item-price,
+[data-theme="nothing"] .sale-bar-total,
+[data-theme="nothing"] .summary-row.total,
+[data-theme="nothing"] .receipt-total {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+[data-theme="nothing"] .stat-value {
+  font-size: 25px;
+}
+
+/* precise, instant feel */
+[data-theme="nothing"] .nav-card,
+[data-theme="nothing"] .item-card,
+[data-theme="nothing"] .tab,
+[data-theme="nothing"] .btn,
+[data-theme="nothing"] .open-stall-btn {
+  transition: background 0.12s linear, color 0.12s linear, border-color 0.12s linear,
+    transform 0.1s linear;
+}
+
+/* ===== bold home layout — glyph sheet ===== */
+[data-theme="nothing"] .view.active:has(> .home-hero) {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "chip chip"
+    "title mascot"
+    "event mascot"
+    "cta cta"
+    "stats stats"
+    "nav nav";
+  padding: 12px 18px 0;
+  max-width: 560px;
+  margin: 0 auto;
+}
+[data-theme="nothing"] .view.active:has(> .home-hero) .home-hero {
+  display: contents;
+}
+[data-theme="nothing"] .view.active:has(> .home-hero) .ready-chip {
+  grid-area: chip;
+  justify-self: end;
+  margin: 0 0 6px;
+  border-radius: 999px;
+  border: 1px dotted var(--border-strong);
+  background: transparent;
+}
+[data-theme="nothing"] .view.active:has(> .home-hero) .home-shop-name {
+  grid-area: title;
+  position: relative;
+  text-align: left;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  padding-right: 18px;
+}
+/* the one red functional dot */
+[data-theme="nothing"] .view.active:has(> .home-hero) .home-shop-name::after {
+  content: "";
+  position: absolute;
+  top: 8px;
+  margin-left: 8px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+[data-theme="nothing"] .view.active:has(> .home-hero) .home-event-line {
+  grid-area: event;
+  text-align: left;
+  margin-top: 6px;
+  padding-bottom: 10px;
+  border-bottom: 1px dotted var(--border-strong);
+}
+/* mascot inside a concentric glyph ring */
+[data-theme="nothing"] .view.active:has(> .home-hero) .home-mascot-fallback,
+[data-theme="nothing"] .view.active:has(> .home-hero) .home-mascot {
+  grid-area: mascot;
+  align-self: start;
+  margin: 4px 0 0;
+}
+[data-theme="nothing"] .view.active:has(> .home-hero) .home-mascot-fallback {
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dotted var(--border-strong);
+  border-radius: 50%;
+}
+[data-theme="nothing"] .view.active:has(> .home-hero) .home-mascot-fallback svg {
+  width: 40px;
+  height: 40px;
+  fill: var(--text) !important;
+}
+[data-theme="nothing"] .view.active:has(> .home-hero) .open-stall-btn {
+  grid-area: cta;
+  width: 100%;
+  margin: 16px 0 4px;
+}
+[data-theme="nothing"] .view.active:has(> .home-hero) > div:has(> .stats) {
+  grid-area: stats;
+  margin: 0;
+  width: 100%;
+  max-width: none;
+  padding: 12px 0 0;
+}
+[data-theme="nothing"] .view.active:has(> .home-hero) .nav-grid {
+  grid-area: nav;
+  margin: 0;
+  width: 100%;
+  max-width: none;
+  padding: 10px 0 24px;
+}
+
+/* ===== nav: BARE glyph rows — no boxes, dotted separators ===== */
+[data-theme="nothing"] .nav-grid {
+  grid-template-columns: 1fr;
+  gap: 0;
+  counter-reset: nothing-nav;
+}
+[data-theme="nothing"] .nav-card {
+  counter-increment: nothing-nav;
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-bottom: 1px dotted var(--border-strong);
+  border-radius: 0;
+  box-shadow: none;
+  padding: 15px 2px;
+}
+[data-theme="nothing"] .nav-card:first-child {
+  border-top: 1px dotted var(--border-strong);
+}
+[data-theme="nothing"] .nav-card:active {
+  background: var(--surface-2);
+  transform: none;
+}
+[data-theme="nothing"] .nav-card .nav-emoji.nav-ico {
+  grid-column: 1;
+  grid-row: 1;
+  margin: 0;
+  color: var(--text);
+}
+[data-theme="nothing"] .nav-card .nav-emoji.nav-ico .ob-ico {
+  width: 20px;
+  height: 20px;
+  stroke-width: 1.75;
+}
+[data-theme="nothing"] .nav-card .nav-name {
+  grid-column: 2;
+  grid-row: 1;
+  font-size: 15px;
+  font-weight: 600;
+}
+[data-theme="nothing"] .nav-card .nav-badge {
+  grid-column: 3;
+  grid-row: 1;
+  position: static;
+  justify-self: end;
+}
+[data-theme="nothing"] .nav-card::after {
+  content: counter(nothing-nav, decimal-leading-zero);
+  grid-column: 4;
+  grid-row: 1;
+  justify-self: end;
+  font-family: var(--font-display);
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* stats: bare data row, dot-matrix values, red dot on the money */
+[data-theme="nothing"] .stats {
+  gap: 0;
+  border-top: 1px dotted var(--border-strong);
+  border-bottom: 1px dotted var(--border-strong);
+  padding: 10px 0;
+}
+[data-theme="nothing"] .stat {
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+}
+[data-theme="nothing"] .stat:first-child .stat-value {
+  color: var(--accent);
+}
+
+/* ===== hero button: black pill, red dot indicator ===== */
+[data-theme="nothing"] .open-stall-btn,
+[data-theme="nothing"] .btn-primary,
+[data-theme="nothing"] .sale-bar-cta {
+  position: relative;
+  background: var(--border-strong);
+  color: #f6f5f2;
+  border: none;
+  border-radius: 999px;
+  box-shadow: none;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+[data-theme="nothing"] .open-stall-btn::after {
+  content: "";
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+[data-theme="nothing"] .open-stall-btn:active,
+[data-theme="nothing"] .btn-primary:active,
+[data-theme="nothing"] .sale-bar-cta:active {
+  background: #000;
+  transform: scale(0.99);
+}
+[data-theme="nothing"] .btn-secondary {
+  background: transparent;
+  border: 1px dotted var(--border-strong);
+  border-radius: 999px;
+  color: var(--text);
+}
+
+/* tabs: text-only, red dot marks the active one */
+[data-theme="nothing"] .tab {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  color: var(--text-muted);
+  font-weight: 600;
+  position: relative;
+}
+[data-theme="nothing"] .tab.active {
+  background: transparent;
+  color: var(--text);
+}
+[data-theme="nothing"] .tab.active::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 2px;
+  transform: translateX(-50%);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* product tiles: hairline cards, dot-matrix prices */
+[data-theme="nothing"] .item-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  box-shadow: none;
+}
+[data-theme="nothing"] .item-card:active {
+  border-color: var(--border-strong);
+  transform: scale(0.99);
+}
+[data-theme="nothing"] .item-card.has-qty {
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+}
+[data-theme="nothing"] .item-card.has-qty .item-price {
+  color: var(--accent);
+}
+[data-theme="nothing"] .qty-badge {
+  background: var(--accent);
+  border-radius: 999px;
+}
+
+/* sale bar / sheet: paper panel, dotted top rule, red total */
+[data-theme="nothing"] .sale-bar {
+  background: var(--surface);
+  border-top: 1px dotted var(--border-strong);
+  box-shadow: var(--shadow-sheet);
+}
+[data-theme="nothing"] .sale-bar-total {
+  color: var(--accent);
+}
+[data-theme="nothing"] .sheet {
+  background: var(--surface);
+}
+[data-theme="nothing"] .sale-line {
+  border-bottom: 1px dotted var(--border);
+}
+[data-theme="nothing"] .section-title {
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+[data-theme="nothing"] .section-title::after {
+  background: transparent;
+  border-top: 1px dotted var(--border-strong);
+}
+[data-theme="nothing"] input,
+[data-theme="nothing"] select,
+[data-theme="nothing"] textarea,
+[data-theme="nothing"] .search-box input {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+[data-theme="nothing"] input:focus,
+[data-theme="nothing"] textarea:focus {
+  border-color: var(--border-strong);
+  outline: none;
+}

@@ -1,0 +1,360 @@
+/* ============================================================
+   OpenBooth — Theme "meido" (メイド喫茶 · maid-café cute)
+   Strawberry-cream sweetness on koishi's rounded type (Quicksand +
+   maru-gothic CJK): lace scallop edges, polka-dot walls, ♡ marks,
+   chocolate ink, one rose accent. All selectors [data-theme="meido"].
+   AA: body/money = chocolate ink or deep rose #b23a67 (5.0:1+);
+   the bright rose is fills-with-white / decoration only.
+   ============================================================ */
+
+/* ===== tokens ===== */
+[data-theme="meido"] {
+  --bg: #fbeff1; /* strawberry milk */
+  --surface: #fffaf7; /* cream */
+  --surface-2: #f7e3e7; /* rose foam */
+  --border: #f2dade;
+  --border-strong: #e3b8c2;
+  --text: #4a3038; /* chocolate — 9.9:1 on surface */
+  --text-secondary: #8d6a75; /* 4.7:1 */
+  --text-muted: #bb9aa4; /* hints only */
+  --accent: #d9578b; /* rose — fills + large */
+  --accent-dark: #b23a67; /* rose ink for money text — 5.6:1 on cream */
+  --accent-light: #fbdfe9;
+  --on-accent: #fff8fa;
+  --success: #4f8a6d; /* mint sage */
+  --success-light: #e0f0e6;
+  --combo: #8a6fb8; /* candy lavender */
+  --combo-light: #efe8f8;
+  --danger: #c25050;
+  --warning: #a97a2c;
+  --font-sans: "Quicksand", "Hiragino Maru Gothic ProN", "Zen Maru Gothic",
+    -apple-system, BlinkMacSystemFont, "PingFang TC", "Noto Sans TC",
+    "Noto Sans JP", sans-serif;
+  --font-display: "Quicksand", "Hiragino Maru Gothic ProN", "Zen Maru Gothic",
+    "PingFang TC", "Noto Sans TC", sans-serif;
+  --r-sm: 12px;
+  --r-md: 16px;
+  --r-lg: 22px;
+  --r-xl: 28px;
+  --shadow-card: 0 3px 10px rgba(196, 120, 146, 0.16), 0 1px 2px rgba(196, 120, 146, 0.1);
+  --shadow-float: 0 10px 26px rgba(196, 120, 146, 0.26);
+  --shadow-sheet: 0 -8px 30px rgba(160, 90, 115, 0.18);
+}
+
+/* rounded display + tabular sweets-menu prices */
+[data-theme="meido"] .home-shop-name,
+[data-theme="meido"] .title,
+[data-theme="meido"] .section-title,
+[data-theme="meido"] .open-stall-btn,
+[data-theme="meido"] .stat-value,
+[data-theme="meido"] .item-price,
+[data-theme="meido"] .sale-bar-total,
+[data-theme="meido"] .summary-row.total,
+[data-theme="meido"] .receipt-total {
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+[data-theme="meido"] .item-price,
+[data-theme="meido"] .sale-bar-total,
+[data-theme="meido"] .summary-row.total,
+[data-theme="meido"] .receipt-total,
+[data-theme="meido"] .stat-value {
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-dark);
+}
+
+/* soft springy touch */
+[data-theme="meido"] .nav-card,
+[data-theme="meido"] .item-card,
+[data-theme="meido"] .tab,
+[data-theme="meido"] .btn,
+[data-theme="meido"] .open-stall-btn {
+  transition: transform 0.2s cubic-bezier(0.2, 0.9, 0.3, 1.25), box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+/* ===== polka-dot wallpaper ===== */
+[data-theme="meido"] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: radial-gradient(circle, rgba(217, 87, 139, 0.09) 2.2px, transparent 2.8px);
+  background-size: 26px 26px;
+}
+
+/* ===== bold home layout — café menu board ===== */
+[data-theme="meido"] .view.active:has(> .home-hero) {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "hero"
+    "cta"
+    "stats"
+    "nav";
+  padding: 0 16px;
+  max-width: 560px;
+  margin: 0 auto;
+}
+[data-theme="meido"] .view.active:has(> .home-hero) .home-hero {
+  grid-area: hero;
+}
+[data-theme="meido"] .view.active:has(> .home-hero) .open-stall-btn {
+  grid-area: cta;
+  width: 100%;
+  margin: 14px 0 4px;
+}
+[data-theme="meido"] .view.active:has(> .home-hero) > div:has(> .stats) {
+  grid-area: stats;
+  margin: 0;
+  width: 100%;
+  max-width: none;
+  padding: 12px 0 0;
+}
+[data-theme="meido"] .view.active:has(> .home-hero) .nav-grid {
+  grid-area: nav;
+  margin: 0;
+  width: 100%;
+  max-width: none;
+  padding: 14px 0 24px;
+}
+
+/* hero = the café sign: hearts around the name, ribbon meta pill */
+[data-theme="meido"] .home-shop-name {
+  font-size: 27px;
+  color: var(--accent-dark);
+  letter-spacing: 0.01em;
+}
+[data-theme="meido"] .home-shop-name::before {
+  content: "♡ ";
+  color: var(--accent);
+  font-weight: 400;
+}
+[data-theme="meido"] .home-shop-name::after {
+  content: " ♡";
+  color: var(--accent);
+  font-weight: 400;
+}
+[data-theme="meido"] .home-event-line {
+  display: inline-block;
+  background: var(--surface);
+  border: 1.5px solid var(--accent-light);
+  border-radius: 999px;
+  padding: 4px 14px;
+  margin-top: 8px;
+  box-shadow: var(--shadow-card);
+}
+[data-theme="meido"] .ready-chip {
+  border-radius: 999px;
+}
+
+/* the mascot sits on a lace doily (scalloped disc) */
+[data-theme="meido"] .home-mascot-fallback {
+  position: relative;
+  padding: 14px 0 6px;
+}
+[data-theme="meido"] .home-mascot-fallback::before {
+  content: "";
+  position: absolute;
+  inset: 2px 0 0 50%;
+  width: 128px;
+  height: 128px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle at center, var(--surface) 62%, transparent 63%),
+    repeating-conic-gradient(var(--surface) 0 12deg, var(--accent-light) 12deg 24deg);
+  box-shadow: var(--shadow-card);
+  z-index: -1;
+}
+
+/* ===== nav tiles: sweets on doilies ===== */
+[data-theme="meido"] .nav-grid {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+[data-theme="meido"] .nav-card {
+  position: relative;
+  background: var(--surface);
+  border: 1.5px solid var(--accent-light);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-card);
+  padding: 20px 12px 18px;
+  overflow: hidden;
+}
+/* lace scallop edge along the card top */
+[data-theme="meido"] .nav-card::before {
+  content: "";
+  position: absolute;
+  top: -1.5px;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: radial-gradient(circle 8px at 8px 0, var(--accent-light) 92%, transparent 94%);
+  background-size: 16px 8px;
+  background-repeat: repeat-x;
+}
+[data-theme="meido"] .nav-card:active {
+  transform: scale(0.95);
+  background: var(--accent-light);
+  border-color: var(--accent);
+}
+[data-theme="meido"] .nav-card .nav-emoji.nav-ico {
+  color: var(--accent);
+  width: 52px;
+  height: 52px;
+  margin: 4px auto 10px;
+  border-radius: 50%;
+  background: var(--surface-2);
+}
+[data-theme="meido"] .nav-card .nav-emoji.nav-ico .ob-ico {
+  width: 24px;
+  height: 24px;
+}
+[data-theme="meido"] .nav-card .nav-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* stats = today's menu board with scallop top */
+[data-theme="meido"] .stats {
+  position: relative;
+  background: var(--surface);
+  border: 1.5px solid var(--accent-light);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-card);
+  padding: 14px 12px 10px;
+  overflow: hidden;
+}
+[data-theme="meido"] .stats::before {
+  content: "";
+  position: absolute;
+  top: -1.5px;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: radial-gradient(circle 8px at 8px 0, var(--accent-light) 92%, transparent 94%);
+  background-size: 16px 8px;
+  background-repeat: repeat-x;
+}
+[data-theme="meido"] .stat {
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+/* ===== hero button: big strawberry pill ===== */
+[data-theme="meido"] .open-stall-btn,
+[data-theme="meido"] .btn-primary,
+[data-theme="meido"] .sale-bar-cta {
+  background: var(--accent);
+  color: var(--on-accent);
+  border: none;
+  border-radius: 999px;
+  box-shadow: 0 6px 18px rgba(217, 87, 139, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  letter-spacing: 0.04em;
+}
+[data-theme="meido"] .open-stall-btn:active,
+[data-theme="meido"] .btn-primary:active,
+[data-theme="meido"] .sale-bar-cta:active {
+  transform: scale(0.97);
+  background: var(--accent-dark);
+}
+[data-theme="meido"] .btn-secondary {
+  border: 1.5px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-secondary);
+}
+
+/* tabs: candy pills */
+[data-theme="meido"] .tab {
+  border: 1.5px solid var(--accent-light);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+[data-theme="meido"] .tab.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+
+/* product tiles: cake cards */
+[data-theme="meido"] .item-card {
+  border: 1.5px solid var(--accent-light);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-card);
+}
+[data-theme="meido"] .item-card:active {
+  transform: scale(0.96);
+}
+[data-theme="meido"] .item-card.has-qty {
+  background: var(--accent-light);
+  border-color: var(--accent);
+}
+[data-theme="meido"] .item-card.has-qty .item-name::after {
+  content: " ♡";
+  color: var(--accent);
+}
+[data-theme="meido"] .qty-badge {
+  border-radius: 999px;
+}
+
+/* sale bar + sheet: cream tray with scallop top */
+[data-theme="meido"] .sale-bar {
+  position: relative;
+  background: var(--surface);
+  border: none;
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+  box-shadow: var(--shadow-sheet);
+}
+[data-theme="meido"] .sheet {
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+}
+[data-theme="meido"] .sale-line {
+  border-bottom: 1.5px dashed var(--accent-light);
+}
+[data-theme="meido"] .summary-row.total::before {
+  content: "♡ ";
+  color: var(--accent);
+  font-weight: 400;
+}
+[data-theme="meido"] .badge,
+[data-theme="meido"] .nav-badge,
+[data-theme="meido"] .ready-chip {
+  border-radius: 999px;
+}
+[data-theme="meido"] input,
+[data-theme="meido"] select,
+[data-theme="meido"] textarea,
+[data-theme="meido"] .search-box input {
+  border-radius: var(--r-md);
+}
+
+/* gentle settle-in, reduced-motion gated */
+[data-theme="meido"] .view.active .nav-card {
+  animation: meido-pop 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+[data-theme="meido"] .nav-card:nth-child(2) { animation-delay: 0.05s; }
+[data-theme="meido"] .nav-card:nth-child(3) { animation-delay: 0.1s; }
+[data-theme="meido"] .nav-card:nth-child(4) { animation-delay: 0.15s; }
+[data-theme="meido"] .nav-card:nth-child(5) { animation-delay: 0.2s; }
+[data-theme="meido"] .nav-card:nth-child(6) { animation-delay: 0.25s; }
+@keyframes meido-pop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="meido"] .view.active .nav-card {
+    animation: none;
+  }
+}

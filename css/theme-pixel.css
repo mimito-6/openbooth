@@ -648,3 +648,45 @@
   width: 100%;
   max-width: none;
 }
+
+/* fix: same auto-placement wrap risk on care-label rows — pin cells; badge
+   gets its own column */
+[data-theme="pixel"] .nav-card {
+  grid-template-columns: auto 1fr auto auto;
+}
+[data-theme="pixel"] .nav-card .nav-emoji.nav-ico {
+  grid-column: 1;
+  grid-row: 1;
+}
+[data-theme="pixel"] .nav-card .nav-name {
+  grid-column: 2;
+  grid-row: 1;
+}
+[data-theme="pixel"] .nav-card .nav-badge {
+  grid-column: 3;
+  grid-row: 1;
+}
+[data-theme="pixel"] .nav-card::after {
+  grid-column: 4;
+  grid-row: 1;
+}
+
+/* ===== touch-up round: stronger label identity ===== */
+/* zebra care-label rows */
+[data-theme="pixel"] .nav-card:nth-child(even) {
+  background: var(--surface-2);
+}
+/* bigger pixel readouts */
+[data-theme="pixel"] .stat-value {
+  font-size: 24px;
+}
+[data-theme="pixel"] .item-price {
+  font-size: 19px;
+}
+[data-theme="pixel"] .sale-bar-total {
+  font-size: 24px;
+}
+/* heavier label frame on the hero panel */
+[data-theme="pixel"] .home-hero {
+  border-width: 2.5px;
+}

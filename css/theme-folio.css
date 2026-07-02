@@ -563,3 +563,22 @@
   width: 100%;
   max-width: none;
 }
+
+/* fix: with a locked-column badge, auto-placement pushed icon/name to row 2 —
+   pin every catalog-row cell explicitly */
+[data-theme="folio"] .nav-card::after {
+  grid-column: 1;
+  grid-row: 1;
+}
+[data-theme="folio"] .nav-card .nav-emoji.nav-ico {
+  grid-column: 2;
+  grid-row: 1;
+}
+[data-theme="folio"] .nav-card .nav-name {
+  grid-column: 3;
+  grid-row: 1;
+}
+[data-theme="folio"] .nav-card .nav-badge {
+  grid-column: 4;
+  grid-row: 1;
+}
