@@ -107,9 +107,7 @@
 }
 /* keep real content above the mural */
 [data-theme="zine"] .view,
-[data-theme="zine"] .header,
-[data-theme="zine"] .sale-bar,
-[data-theme="zine"] .sheet {
+[data-theme="zine"] .header {
   position: relative;
   z-index: 1;
 }
@@ -424,6 +422,7 @@
 [data-theme="zine"] .sheet {
   border: 2px solid var(--border-strong);
   border-bottom: none;
+  background: #f4f3ef; /* grey-white sheet base per owner feedback */
 }
 [data-theme="zine"] .sale-line {
   border-bottom: 1.5px dashed var(--border-strong);

@@ -4,7 +4,7 @@
 (function () {
   window.OB = window.OB || {};
   OB.app = OB.app || {};
-  const CACHE_NAME = "openbooth-v26";
+  const CACHE_NAME = "openbooth-v27";
 
   // ---- customer-facing display ----
   let cfd = null;

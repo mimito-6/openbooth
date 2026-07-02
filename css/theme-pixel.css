@@ -1,692 +1,497 @@
 /* ============================================================
-   OpenBooth — Theme "pixel" (Studio Innate techwear label)
-   The app becomes a garment care-label: near-monochrome slate
-   ink on pale periwinkle, chunky PIXEL display numerals, barcode
-   blocks, diagonal hazard-stripe dividers, ™®© micro-marks, and
-   inverse-video press states as the core interaction.
-   All selectors scoped to [data-theme="pixel"].
-   ------------------------------------------------------------
-   AA notes (single ink = --accent #3a4150):
-     ink #343b4e on bg   #e2e5f0 ≈ 7.9:1   (body / money)  PASS
-     ink #343b4e on surf #ecEEf7 ≈ 8.6:1                    PASS
-     paper #eef0f8 on ink #3a4150 ≈ 8.0:1 (inverse video)   PASS
-     secondary #6a7188 on surface ≈ 4.6:1 (labels)          PASS
-     muted #949bb0 = decoration/hairlines only — never money
+   OpenBooth — Theme "pixel" v2 (THE SIGNAL · black/yellow HUD)
+   Rebuilt to the owner's reference: near-black observation field,
+   fine white survey grid, ONE signal-yellow accent, dot-matrix
+   type EVERYWHERE (DotGothic16 covers Latin + JP + most Han
+   glyphs; anything missing falls back to system per glyph),
+   ruler ticks, crosshairs, a barcode block, corner brackets,
+   timestamp micro-labels. All selectors [data-theme="pixel"].
+   AA: yellow #f2e733 on #101014 = 13.9:1; ink #ececec = 14.9:1.
    ============================================================ */
 
-/* ---- new display face: chunky pixel, Latin + digits only ---- */
-@font-face {
-  font-family: "Silkscreen";
-  font-weight: 400;
-  src: url("../fonts/silkscreen-latin.woff2") format("woff2");
-  font-display: swap;
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+2000-206F, U+20AC, U+2122,
-    U+2212, U+FEFF;
-}
-
-/* ============================================================
-   1 · TOKEN BLOCK — self-contained near-monochrome palette
-   ============================================================ */
+/* ===== tokens ===== */
 [data-theme="pixel"] {
-  --bg: #e2e5f0; /* periwinkle sheet */
-  --surface: #ecEEf7; /* lighter panel */
-  --surface-2: #d3d7e6; /* recessed / stripe field */
-  --border: #b9c0d6; /* hairline */
-  --border-strong: #3a4150; /* THE INK — hard rules */
-  --text: #343b4e; /* slate ink 7.9:1 */
-  --text-secondary: #6a7188; /* 4.6:1 labels */
-  --text-muted: #949bb0; /* decoration/hairline only */
-  --accent: #3a4150; /* accent IS the ink — mono */
-  --accent-dark: #272d3d;
-  --accent-light: #cdd2e4; /* pale ink wash */
-  --on-accent: #eef0f8; /* paper on ink 8.0:1 */
-  --success: #4f7264; /* muted, holds the mono field */
-  --success-light: #dde6e1;
-  --combo: #5c6683;
-  --combo-light: #dee1ec;
-  --danger: #9c5454;
-  --warning: #8b7748;
-  /* structural: body-latin grotesk, hard 2px pixel corners, flat */
-  --font-sans: "Space Grotesk", -apple-system, BlinkMacSystemFont, "PingFang TC",
+  --bg: #101014; /* observation black */
+  --surface: #17171c;
+  --surface-2: #1f1f26;
+  --border: #2c2c34; /* faint rule */
+  --border-strong: #4a4a55;
+  --text: #ececec; /* 14.9:1 */
+  --text-secondary: #a9a9b2; /* 7.4:1 */
+  --text-muted: #6c6c76; /* decoration only */
+  --accent: #f2e733; /* signal yellow — data + primary only */
+  --accent-dark: #d8cd1f;
+  --accent-light: #2b2a12; /* dark yellow wash */
+  --on-accent: #14140a; /* black ink on yellow */
+  --success: #7ddc9a;
+  --success-light: #14251a;
+  --combo: #8fb6ff;
+  --combo-light: #161d2c;
+  --danger: #ff7a70;
+  --warning: #e8b84a;
+  /* dot-matrix first for EVERYTHING (Latin+JP+Han via the chunked
+     DotGothic16 css; per-glyph fallback to system when uncovered) */
+  --font-sans: "DotGothic16", -apple-system, BlinkMacSystemFont, "PingFang TC",
     "Hiragino Sans", "Noto Sans TC", "Noto Sans JP", sans-serif;
-  --font-display: "Space Grotesk", -apple-system, "PingFang TC", "Noto Sans TC",
-    sans-serif;
-  --r-sm: 2px;
+  --font-display: "DotGothic16", -apple-system, "PingFang TC", "Hiragino Sans",
+    "Noto Sans TC", "Noto Sans JP", sans-serif;
+  --r-sm: 0px;
   --r-md: 2px;
-  --r-lg: 2px;
-  --r-xl: 3px;
+  --r-lg: 3px;
+  --r-xl: 4px;
   --shadow-card: none;
-  --shadow-float: none;
-  --shadow-sheet: 0 -10px 34px rgba(39, 45, 61, 0.22);
-  /* reusable ink patterns */
-  --pix-hazard: repeating-linear-gradient(
-    45deg,
-    var(--accent) 0 8px,
-    transparent 8px 16px
-  );
-  --pix-barcode: repeating-linear-gradient(
-    90deg,
-    var(--accent) 0 2px,
-    transparent 2px 5px,
-    var(--accent) 5px 6px,
-    transparent 6px 9px,
-    var(--accent) 9px 12px,
-    transparent 12px 14px
-  );
+  --shadow-float: 0 0 0 1px var(--border-strong);
+  --shadow-sheet: 0 -12px 30px rgba(0, 0, 0, 0.6);
 }
 
-/* ============================================================
-   2 · DISPLAY TYPE — Silkscreen pixel numerals (≥15px only)
-   Latin digits render pixel; CJK shop names fall to system bold.
-   ============================================================ */
-[data-theme="pixel"] .stat-value,
-[data-theme="pixel"] .item-price,
-[data-theme="pixel"] .sale-bar-total,
-[data-theme="pixel"] .sale-line-total,
-[data-theme="pixel"] .summary-row.total,
-[data-theme="pixel"] .receipt-total {
-  font-family: "Silkscreen", var(--font-display);
-  font-weight: 400;
-  letter-spacing: 0.01em;
-  font-variant-numeric: tabular-nums lining-nums;
-}
-/* enforce the ≥15px legibility floor on every pixel readout */
-[data-theme="pixel"] .stat-value {
-  font-size: 21px;
-}
-[data-theme="pixel"] .stat-value.small {
-  font-size: 16px;
-}
-[data-theme="pixel"] .item-price {
-  font-size: 18px;
-  color: var(--text);
-}
-[data-theme="pixel"] .sale-bar-total {
-  font-size: 22px;
-}
-[data-theme="pixel"] .stat-value .unit,
-[data-theme="pixel"] .item-price .pcs {
-  font-family: var(--font-sans); /* tiny units stay grotesk (readable) */
-}
-/* shop name: pixel ONLY if Latin (CJK auto-falls to system bold — acceptable) */
-[data-theme="pixel"] .home-shop-name {
-  font-family: "Silkscreen", var(--font-display);
-  font-weight: 400;
-  font-size: 20px;
-  letter-spacing: 0.01em;
-  line-height: 1.25;
-}
-/* micro-labels: grotesk, wide tracking (Latin-safe, applied to Latin fields) */
-[data-theme="pixel"] .stat-label,
-[data-theme="pixel"] .home-event-line {
-  font-family: var(--font-sans);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  font-size: 10px;
+/* precise, instant interactions */
+[data-theme="pixel"] .nav-card,
+[data-theme="pixel"] .item-card,
+[data-theme="pixel"] .tab,
+[data-theme="pixel"] .btn,
+[data-theme="pixel"] .open-stall-btn {
+  transition: background 0.09s steps(2), color 0.09s steps(2), border-color 0.09s linear;
 }
 
-/* ============================================================
-   3 · HAZARD-STRIPE DIVIDERS — ◢◢◢ diagonal ink bands
-   ============================================================ */
-[data-theme="pixel"] .section-title::after {
+/* ===== the survey grid field ===== */
+[data-theme="pixel"] body {
+  background: #101014;
+}
+[data-theme="pixel"] body::before {
   content: "";
-  flex: 1;
-  height: 8px;
-  background: var(--pix-hazard);
-  opacity: 0.85;
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: repeating-linear-gradient(to right, rgba(236, 236, 236, 0.055) 0 1px, transparent 1px 46px),
+    repeating-linear-gradient(to bottom, rgba(236, 236, 236, 0.055) 0 1px, transparent 1px 46px);
 }
-[data-theme="pixel"] .section-title {
-  color: var(--text);
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  font-size: 11px;
-}
-
-/* ============================================================
-   4 · HOME HERO — care-label sheet: ™ mark + barcode strip
-   ============================================================ */
-[data-theme="pixel"] .home-hero {
-  position: relative;
-  border: 2px solid var(--accent);
-  background: var(--surface);
-  margin: 14px 16px 4px;
-  padding: 22px 20px 18px;
-  max-width: 560px;
-}
-/* trademark micro-mark after the shop name (Latin symbol — CJK-safe) */
-[data-theme="pixel"] .home-shop-name::after {
-  content: " \2122"; /* ™ */
-  font-family: var(--font-sans);
-  font-size: 0.5em;
-  vertical-align: super;
-  color: var(--text-secondary);
-}
-/* corner coordinate micro-label — Latin/digits/symbols only */
-[data-theme="pixel"] .home-hero::before {
-  content: "51.40\B0N \2014 1.32\B0W";
-  position: absolute;
-  top: 7px;
-  left: 9px;
-  font-family: var(--font-sans);
-  font-size: 8px;
-  letter-spacing: 0.1em;
-  color: var(--text-muted);
-}
-/* BARCODE strip under the hero — repeating-linear-gradient block */
-[data-theme="pixel"] .home-hero::after {
+/* faint film grain */
+[data-theme="pixel"] body::after {
   content: "";
-  display: block;
-  width: 60%;
-  max-width: 260px;
-  height: 28px;
-  margin: 14px auto 0;
-  background: var(--pix-barcode);
-  background-repeat: repeat-x;
-}
-/* scan sweep: 1px paper line crosses the barcode once on load */
-[data-theme="pixel"] .home-hero {
-  overflow: hidden;
-}
-[data-theme="pixel"] .view.active .home-hero::after {
-  animation: pixel-scan 0.6s ease-out 0.15s 1 both;
-}
-@keyframes pixel-scan {
-  0% {
-    box-shadow: inset -100% 0 0 -2px rgba(236, 238, 247, 0.9);
-  }
-  100% {
-    box-shadow: inset 100% 0 0 -2px rgba(236, 238, 247, 0);
-  }
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 6;
+  opacity: 0.05;
+  mix-blend-mode: screen;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 @media (prefers-reduced-motion: reduce) {
-  [data-theme="pixel"] .view.active .home-hero::after {
-    animation: none;
+  [data-theme="pixel"] body::after {
+    display: none;
   }
 }
-
-/* ============================================================
-   5 · NAV CARDS — flat panels, pixel-notched corners, counters
-   :active = INVERSE VIDEO (the theme's signature interaction)
-   ============================================================ */
-[data-theme="pixel"] .nav-grid {
-  gap: 12px;
-}
-[data-theme="pixel"] .nav-card {
+[data-theme="pixel"] .view,
+[data-theme="pixel"] .header {
   position: relative;
-  background: var(--surface);
-  border: 2px solid var(--accent);
-  box-shadow: none;
-  padding: 18px 10px 20px;
-  /* pixel silhouette: 4px stepped notches cut off each corner */
-  clip-path: polygon(0 4px, 4px 4px, 4px 0, calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px));
-  transition: background 0.08s steps(1), color 0.08s steps(1);
-}
-[data-theme="pixel"] .nav-card:active {
-  background: var(--accent); /* inverse video: ink fill */
-  border-color: var(--accent);
-}
-[data-theme="pixel"] .nav-card:active .nav-ico,
-[data-theme="pixel"] .nav-card:active .nav-name,
-[data-theme="pixel"] .nav-card:active .nav-name::after {
-  color: var(--on-accent); /* paper text/icon */
-}
-[data-theme="pixel"] .nav-card .nav-ico {
-  color: var(--accent);
-}
-[data-theme="pixel"] .nav-card .nav-emoji.nav-ico .ob-ico {
-  width: 30px;
-  height: 30px;
-  stroke-width: 2.25;
-}
-[data-theme="pixel"] .nav-card .nav-name {
-  color: var(--text);
-  font-weight: 600;
-  font-size: 13px;
-  letter-spacing: 0.02em;
-}
-/* CSS counter "_01…_06" micro index (Latin/digits only) */
-[data-theme="pixel"] .nav-grid {
-  counter-reset: pixnav;
-}
-[data-theme="pixel"] .nav-card {
-  counter-increment: pixnav;
-}
-[data-theme="pixel"] .nav-card .nav-name::after {
-  content: "_0" counter(pixnav);
-  display: block;
-  margin-top: 4px;
-  font-family: var(--font-sans);
-  font-size: 9px;
-  letter-spacing: 0.14em;
-  font-weight: 500;
-  color: var(--text-muted);
+  z-index: 1;
 }
 
-/* ============================================================
-   6 · STAT ROWS — label/data rows, hairline ink rules, ® mark
-   ============================================================ */
-[data-theme="pixel"] .stat {
-  position: relative;
-  background: var(--surface);
-  border: none;
-  border-top: 2px solid var(--accent);
-  border-bottom: 1px solid var(--border);
-  border-radius: 0;
-  box-shadow: none;
-  padding: 9px 12px 11px;
-}
-[data-theme="pixel"] .stat-label {
-  color: var(--text-secondary);
-}
-/* tiny registered-mark globe on the first stat (Latin symbol) */
-[data-theme="pixel"] .stats .stat:first-child::after {
-  content: "\00AE"; /* ® */
-  position: absolute;
-  top: 7px;
-  right: 8px;
-  font-family: var(--font-sans);
-  font-size: 10px;
-  color: var(--text-muted);
-}
-
-/* ============================================================
-   7 · OPEN-STALL BUTTON — solid ink block, notched, inverse flash
-   ============================================================ */
-[data-theme="pixel"] .open-stall-btn {
-  background: var(--accent);
-  color: var(--on-accent);
-  border: 2px solid var(--accent);
-  border-radius: 0;
-  box-shadow: none;
-  font-family: var(--font-sans);
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  padding: 19px 20px;
-  clip-path: polygon(0 5px, 5px 5px, 5px 0, calc(100% - 5px) 0, calc(100% - 5px) 5px, 100% 5px, 100% calc(100% - 5px), calc(100% - 5px) calc(100% - 5px), calc(100% - 5px) 100%, 5px 100%, 5px calc(100% - 5px), 0 calc(100% - 5px));
-  transition: background 0.08s steps(1), color 0.08s steps(1);
-}
-[data-theme="pixel"] .open-stall-btn:active {
-  transform: none;
-  background: var(--bg); /* inverse flash: paper fill */
-  color: var(--accent); /* ink text */
-  box-shadow: inset 0 0 0 2px var(--accent);
-}
-
-/* ============================================================
-   8 · TABS — rectangle chips, inverse-video active
-   ============================================================ */
-[data-theme="pixel"] .tab {
-  background: var(--surface);
-  color: var(--text);
-  border: 1.5px solid var(--accent);
-  border-radius: var(--r-sm);
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  transition: background 0.08s steps(1), color 0.08s steps(1);
-}
-[data-theme="pixel"] .tab.active {
-  background: var(--accent); /* inverse video */
-  color: var(--on-accent);
-  border-color: var(--accent);
-}
-[data-theme="pixel"] .tab:active {
-  transform: translateY(1px);
-}
-
-/* ============================================================
-   9 · ITEM CARDS — panel + ink border; has-qty = inverse header
-   ============================================================ */
-[data-theme="pixel"] .item-card {
-  background: var(--surface);
-  border: 1.5px solid var(--accent);
-  border-radius: var(--r-sm);
-  box-shadow: none;
-  transition: background 0.08s steps(1), border-color 0.08s steps(1),
-    transform 0.06s;
-}
-[data-theme="pixel"] .item-card:active {
-  transform: translateY(1px);
-  background: var(--accent);
-}
-[data-theme="pixel"] .item-card:active .item-name,
-[data-theme="pixel"] .item-card:active .item-price,
-[data-theme="pixel"] .item-card:active .item-bundle {
-  color: var(--on-accent); /* inverse video on press */
-}
-[data-theme="pixel"] .item-card.has-qty {
-  background: var(--accent-light);
-  border: 3px solid var(--accent);
-}
-[data-theme="pixel"] .item-name {
-  color: var(--text);
-  font-weight: 700;
-}
-[data-theme="pixel"] .item-bundle {
-  color: var(--text-secondary);
-  font-weight: 600;
-}
-/* qty badge = ink square with paper pixel digit */
-[data-theme="pixel"] .qty-badge {
-  background: var(--accent);
-  color: var(--on-accent);
-  border-radius: 0;
-  box-shadow: 0 0 0 2px var(--surface);
-  font-family: "Silkscreen", var(--font-display);
-  font-weight: 400;
-  font-size: 15px; /* pixel digit ≥15px */
-  min-width: 26px;
-  height: 26px;
-}
-[data-theme="pixel"] .item-card.combo {
-  border-color: var(--combo);
-}
-[data-theme="pixel"] .item-card.combo.has-qty {
-  border-color: var(--combo);
-  background: var(--combo-light);
-}
-[data-theme="pixel"] .item-card.combo .qty-badge {
-  background: var(--combo);
-}
-
-/* ============================================================
-   10 · SALE BAR — paper bar, hazard-stripe top edge, ink CTA
-   ============================================================ */
-[data-theme="pixel"] .sale-bar {
-  position: fixed;
-  background: var(--surface);
-  color: var(--text);
-  border: 2px solid var(--accent);
-  border-radius: var(--r-sm);
-  box-shadow: none;
-  overflow: hidden;
-}
-[data-theme="pixel"] .sale-bar::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 6px;
-  background: var(--pix-hazard);
-  opacity: 0.9;
-}
-[data-theme="pixel"] .sale-bar-count {
-  color: var(--text-secondary);
-  opacity: 1;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-size: 10px;
-}
-[data-theme="pixel"] .sale-bar-total {
-  color: var(--text);
-}
-[data-theme="pixel"] .sale-bar-cta {
-  background: var(--accent); /* solid ink block */
-  color: var(--on-accent);
-  border-radius: var(--r-sm);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-[data-theme="pixel"] .sale-bar:active {
-  transform: scale(0.99);
-}
-
-/* ============================================================
-   11 · SHEET — top hazard stripe + "C:\>" title prefix
-   ============================================================ */
-[data-theme="pixel"] .sheet {
-  background: var(--bg);
-  border: 2px solid var(--accent);
-  border-bottom: none;
-  border-radius: var(--r-xl) var(--r-xl) 0 0;
-}
-[data-theme="pixel"] .sheet-header {
-  position: relative;
-}
-[data-theme="pixel"] .sheet-header::after {
-  content: "";
-  position: absolute;
-  left: 20px;
-  right: 20px;
-  bottom: 2px;
-  height: 8px;
-  background: var(--pix-hazard);
-  opacity: 0.8;
-}
-[data-theme="pixel"] .sheet-title::before {
-  content: "C:\\> "; /* decorative terminal prefix (Latin/symbols) */
-  font-family: var(--font-sans);
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-[data-theme="pixel"] .sheet-handle {
-  background: var(--accent);
-  border-radius: 0;
-  width: 44px;
-  height: 3px;
-}
-[data-theme="pixel"] .sheet-close {
-  background: var(--surface);
-  border: 1.5px solid var(--accent);
-  border-radius: 0;
-  color: var(--text);
-}
-[data-theme="pixel"] .sheet-close:active {
-  background: var(--accent);
-  color: var(--on-accent);
-}
-
-/* ============================================================
-   12 · BUTTONS / BADGES / INPUTS — flat ink, inverse press
-   ============================================================ */
-[data-theme="pixel"] .btn-primary {
-  background: var(--accent);
-  color: var(--on-accent);
-  border: 2px solid var(--accent);
-  border-radius: var(--r-sm);
-  box-shadow: none;
-  letter-spacing: 0.04em;
-  transition: background 0.08s steps(1), color 0.08s steps(1);
-}
-[data-theme="pixel"] .btn-primary:active {
-  transform: translateY(1px);
-  background: var(--bg);
-  color: var(--accent);
-  box-shadow: inset 0 0 0 2px var(--accent);
-}
-[data-theme="pixel"] .btn-secondary {
-  background: var(--surface);
-  color: var(--text);
-  border: 1.5px solid var(--accent);
-  border-radius: var(--r-sm);
-}
-[data-theme="pixel"] .btn-secondary:active {
-  transform: translateY(1px);
-  background: var(--accent);
-  color: var(--on-accent);
-}
-[data-theme="pixel"] .btn-success:active {
-  transform: translateY(1px);
-}
-[data-theme="pixel"] .badge,
-[data-theme="pixel"] .nav-badge {
-  border-radius: var(--r-sm);
-  border: 1.5px solid var(--accent);
-  font-weight: 700;
-}
-[data-theme="pixel"] .search-box input,
-[data-theme="pixel"] input,
-[data-theme="pixel"] select,
-[data-theme="pixel"] textarea {
-  border-radius: var(--r-sm);
-  border: 1.5px solid var(--border-strong);
-  background: var(--surface);
-}
-/* ready chip: flat, rectangular */
-[data-theme="pixel"] .ready-chip {
-  border-radius: var(--r-sm);
-  border: 1.5px solid var(--border);
-  box-shadow: none;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-size: 10px;
-}
-[data-theme="pixel"] .pay-chip {
-  border-radius: var(--r-sm);
-  border: 1.5px solid var(--accent);
-}
-[data-theme="pixel"] .pay-chip.active {
-  background: var(--accent);
-  color: var(--on-accent);
-}
-[data-theme="pixel"] .mini-btn {
-  border-radius: var(--r-sm);
-}
-[data-theme="pixel"] .mini-btn.active {
-  background: var(--accent);
-  color: var(--on-accent);
-  border-color: var(--accent);
-}
-
-/* summary total row: pixel numerals already applied; add ink rule */
-[data-theme="pixel"] .summary-row.total {
-  border-top: 2px solid var(--accent);
-}
-
-/* ===== V3 BOLD HOME LAYOUT — garment care label ===== */
-/* Home becomes one printed label sheet: brand block up top (already framed
-   by the hero panel), nav turns into single-column CARE-LABEL ROWS with
-   right-aligned _0N codes, and the stats data block drops to the bottom of
-   the label. Uses :has(); older engines keep the stacked fallback. */
+/* ===== bold home layout — the observation poster ===== */
 [data-theme="pixel"] .view.active:has(> .home-hero) {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr auto;
   grid-template-areas:
-    "hero"
-    "cta"
-    "nav"
-    "stats";
-  padding: 0 16px;
+    "chip chip"
+    "title title"
+    "event mascot"
+    "cta cta"
+    "stats stats"
+    "nav nav";
+  padding: 10px 18px 0;
   max-width: 560px;
   margin: 0 auto;
 }
 [data-theme="pixel"] .view.active:has(> .home-hero) .home-hero {
-  grid-area: hero;
+  display: contents;
+}
+/* top strip: status chip, like the poster's "2025 · 2026 · 2027" row */
+[data-theme="pixel"] .view.active:has(> .home-hero) .ready-chip {
+  grid-area: chip;
+  justify-self: end;
+  margin: 2px 0 10px;
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  border-radius: 0;
+  color: var(--text-secondary);
+}
+/* THE headline: signal-yellow dot-matrix, corner-bracketed */
+[data-theme="pixel"] .view.active:has(> .home-hero) .home-shop-name {
+  grid-area: title;
+  position: relative;
+  text-align: left;
+  font-size: 36px;
+  line-height: 1.08;
+  color: var(--accent);
+  padding: 14px 12px 12px;
+  overflow-wrap: anywhere;
+}
+[data-theme="pixel"] .view.active:has(> .home-hero) .home-shop-name::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 18px;
+  height: 18px;
+  border-left: 1.5px solid var(--text-secondary);
+  border-top: 1.5px solid var(--text-secondary);
+}
+[data-theme="pixel"] .view.active:has(> .home-hero) .home-shop-name::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 18px;
+  height: 18px;
+  border-right: 1.5px solid var(--text-secondary);
+  border-bottom: 1.5px solid var(--text-secondary);
+}
+/* quiet white subline like "MAYBE THEY ARE THERE" */
+[data-theme="pixel"] .view.active:has(> .home-hero) .home-event-line {
+  grid-area: event;
+  position: relative;
+  text-align: left;
+  margin: 2px 0 0 12px;
+  padding-left: 18px;
+  color: var(--text-secondary);
+}
+/* ruler tick scale beside the meta line (the 1420/72 gauge) */
+[data-theme="pixel"] .view.active:has(> .home-hero) .home-event-line::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -4px;
+  bottom: -4px;
+  width: 8px;
+  background-image: repeating-linear-gradient(to bottom, var(--text-muted) 0 1px, transparent 1px 5px);
+}
+/* mascot inside a crosshair target */
+[data-theme="pixel"] .view.active:has(> .home-hero) .home-mascot-fallback,
+[data-theme="pixel"] .view.active:has(> .home-hero) .home-mascot {
+  grid-area: mascot;
+  align-self: start;
+  margin: 0 4px 0 0;
+}
+[data-theme="pixel"] .view.active:has(> .home-hero) .home-mascot-fallback {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+[data-theme="pixel"] .view.active:has(> .home-hero) .home-mascot-fallback::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--border-strong);
+}
+[data-theme="pixel"] .view.active:has(> .home-hero) .home-mascot-fallback::after {
+  content: "+";
+  position: absolute;
+  top: -10px;
+  right: -13px;
+  color: var(--accent);
+  font-size: 13px;
+  font-family: var(--font-display);
+}
+[data-theme="pixel"] .view.active:has(> .home-hero) .home-mascot-fallback svg {
+  width: 38px;
+  height: 38px;
+  fill: var(--text) !important;
 }
 [data-theme="pixel"] .view.active:has(> .home-hero) .open-stall-btn {
   grid-area: cta;
   width: 100%;
-  margin: 14px 0 4px;
-}
-[data-theme="pixel"] .view.active:has(> .home-hero) .nav-grid {
-  grid-area: nav;
-  padding: 14px 0 6px;
-  max-width: none;
+  margin: 16px 0 4px;
 }
 [data-theme="pixel"] .view.active:has(> .home-hero) > div:has(> .stats) {
   grid-area: stats;
-  padding: 4px 0 26px;
-  max-width: none;
-}
-/* nav -> care-label rows: icon · name ······ _0N */
-[data-theme="pixel"] .nav-grid {
-  grid-template-columns: 1fr;
-  gap: 7px;
-}
-[data-theme="pixel"] .nav-card {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 14px;
-  text-align: left;
-  padding: 13px 16px;
-  min-height: 52px;
-}
-[data-theme="pixel"] .nav-card .nav-emoji.nav-ico {
-  margin: 0;
-}
-[data-theme="pixel"] .nav-card .nav-emoji.nav-ico .ob-ico {
-  width: 21px;
-  height: 21px;
-}
-[data-theme="pixel"] .nav-card .nav-name {
-  font-size: 15px;
-}
-/* the _0N counter moves inline to the row end */
-[data-theme="pixel"] .nav-card::after {
-  position: static;
-  grid-column: 3;
-  justify-self: end;
-}
-[data-theme="pixel"] .nav-card .nav-badge {
-  position: static;
-  grid-column: 3;
-  justify-self: end;
-}
-/* stats -> bottom data strip of the label */
-[data-theme="pixel"] .stats {
-  border: 2px solid var(--text);
-  gap: 0;
-  background: var(--surface);
-}
-[data-theme="pixel"] .stat {
-  border: none;
-  border-right: 1.5px solid var(--border-strong);
-  border-radius: 0;
-  box-shadow: none;
-}
-[data-theme="pixel"] .stat:last-child {
-  border-right: none;
-}
-
-/* fix: auto side-margins on grid items absorb free space and shrink them
-   to fit-content — force full-width inside the bold home grid */
-[data-theme="pixel"] .view.active:has(> .home-hero) > div:has(> .stats),
-[data-theme="pixel"] .view.active:has(> .home-hero) .nav-grid {
   margin: 0;
   width: 100%;
   max-width: none;
+  padding: 12px 0 0;
+}
+[data-theme="pixel"] .view.active:has(> .home-hero) .nav-grid {
+  grid-area: nav;
+  margin: 0;
+  width: 100%;
+  max-width: none;
+  padding: 12px 0 24px;
 }
 
-/* fix: same auto-placement wrap risk on care-label rows — pin cells; badge
-   gets its own column */
-[data-theme="pixel"] .nav-card {
-  grid-template-columns: auto 1fr auto auto;
+/* ===== CTA: yellow signal bar ===== */
+[data-theme="pixel"] .open-stall-btn,
+[data-theme="pixel"] .btn-primary,
+[data-theme="pixel"] .sale-bar-cta {
+  background: var(--accent);
+  color: var(--on-accent);
+  border: none;
+  border-radius: var(--r-md);
+  font-family: var(--font-display);
+  font-weight: 400;
+  box-shadow: none;
 }
-[data-theme="pixel"] .nav-card .nav-emoji.nav-ico {
+[data-theme="pixel"] .open-stall-btn:active,
+[data-theme="pixel"] .btn-primary:active,
+[data-theme="pixel"] .sale-bar-cta:active {
+  background: var(--text);
+  color: #101014;
+}
+[data-theme="pixel"] .btn-secondary {
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
+  color: var(--text-secondary);
+}
+
+/* ===== stats: instrument readouts, yellow data + barcode ===== */
+[data-theme="pixel"] .stats {
+  gap: 0;
+  border-top: 1px solid var(--border-strong);
+  border-bottom: 1px solid var(--border-strong);
+  padding: 10px 0;
+  position: relative;
+}
+[data-theme="pixel"] .stats::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: -13px;
+  width: 64px;
+  height: 8px;
+  background-image: repeating-linear-gradient(90deg, var(--text-muted) 0 2px, transparent 2px 4px, var(--text-muted) 4px 5px, transparent 5px 9px);
+}
+[data-theme="pixel"] .stat {
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+}
+[data-theme="pixel"] .stat-value {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 25px;
+  color: var(--accent);
+}
+[data-theme="pixel"] .stat-label {
+  color: var(--text-muted);
+}
+
+/* ===== nav: target-list rows with crosshair markers ===== */
+[data-theme="pixel"] .nav-grid {
+  grid-template-columns: 1fr;
+  gap: 0;
+  counter-reset: pixel-nav;
+  border-top: 1px solid var(--border-strong);
+}
+[data-theme="pixel"] .nav-card {
+  counter-increment: pixel-nav;
+  display: grid;
+  grid-template-columns: auto auto 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  box-shadow: none;
+  padding: 15px 4px;
+}
+[data-theme="pixel"] .nav-card::before {
+  content: "+";
   grid-column: 1;
   grid-row: 1;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-family: var(--font-display);
 }
-[data-theme="pixel"] .nav-card .nav-name {
+[data-theme="pixel"] .nav-card:active {
+  background: var(--accent-light);
+}
+[data-theme="pixel"] .nav-card:active::before {
+  color: var(--accent);
+}
+[data-theme="pixel"] .nav-card .nav-emoji.nav-ico {
   grid-column: 2;
   grid-row: 1;
+  margin: 0;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text);
 }
-[data-theme="pixel"] .nav-card .nav-badge {
+[data-theme="pixel"] .nav-card .nav-emoji.nav-ico .ob-ico {
+  width: 20px;
+  height: 20px;
+  stroke-width: 1.75;
+}
+[data-theme="pixel"] .nav-card .nav-name {
   grid-column: 3;
   grid-row: 1;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 16px;
+  color: var(--text);
 }
-[data-theme="pixel"] .nav-card::after {
+[data-theme="pixel"] .nav-card .nav-badge {
   grid-column: 4;
   grid-row: 1;
+  position: static;
+  justify-self: end;
+  background: var(--accent);
+  color: var(--on-accent);
+  border-radius: 0;
+  font-family: var(--font-display);
+}
+[data-theme="pixel"] .nav-card::after {
+  content: counter(pixel-nav, decimal-leading-zero);
+  grid-column: 5;
+  grid-row: 1;
+  justify-self: end;
+  font-family: var(--font-display);
+  font-size: 13px;
+  color: var(--text-muted);
 }
 
-/* ===== touch-up round: stronger label identity ===== */
-/* zebra care-label rows */
-[data-theme="pixel"] .nav-card:nth-child(even) {
-  background: var(--surface-2);
+/* ===== header: timestamp micro-label ===== */
+[data-theme="pixel"] .header {
+  background: rgba(16, 16, 20, 0.94);
+  border-bottom: 1px solid var(--border-strong);
 }
-/* bigger pixel readouts */
-[data-theme="pixel"] .stat-value {
-  font-size: 24px;
+[data-theme="pixel"] .title {
+  font-family: var(--font-display);
+  font-weight: 400;
+}
+[data-theme="pixel"] .header-top {
+  position: relative;
+}
+[data-theme="pixel"] .header-top::after {
+  content: "1420 - 72 UTC";
+  position: absolute;
+  top: -3px;
+  right: 2px;
+  font: 400 8px/1 var(--font-display);
+  letter-spacing: 0.22em;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+/* ===== front desk ===== */
+[data-theme="pixel"] .tab {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  color: var(--text-secondary);
+  font-family: var(--font-display);
+  font-weight: 400;
+}
+[data-theme="pixel"] .tab.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+[data-theme="pixel"] .item-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  box-shadow: none;
+}
+[data-theme="pixel"] .item-name {
+  font-family: var(--font-display);
+  font-weight: 400;
 }
 [data-theme="pixel"] .item-price {
+  font-family: var(--font-display);
+  font-weight: 400;
   font-size: 19px;
+  color: var(--accent);
+}
+[data-theme="pixel"] .item-card:active {
+  border-color: var(--accent);
+}
+[data-theme="pixel"] .item-card.has-qty {
+  background: var(--accent-light);
+  border: 1px solid var(--accent);
+}
+[data-theme="pixel"] .qty-badge {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-radius: 0;
+  font-family: var(--font-display);
+}
+[data-theme="pixel"] .item-card.sold-out {
+  opacity: 0.45;
+}
+
+/* sale bar: black instrument shelf, yellow readout */
+[data-theme="pixel"] .sale-bar {
+  background: rgba(16, 16, 20, 0.96);
+  border-top: 1px solid var(--accent);
+  box-shadow: var(--shadow-sheet);
 }
 [data-theme="pixel"] .sale-bar-total {
+  font-family: var(--font-display);
+  font-weight: 400;
   font-size: 24px;
+  color: var(--accent);
 }
-/* heavier label frame on the hero panel */
-[data-theme="pixel"] .home-hero {
-  border-width: 2.5px;
+[data-theme="pixel"] .sale-bar-count {
+  color: var(--text-secondary);
+}
+
+/* sheet: dark instrument panel */
+[data-theme="pixel"] .sheet {
+  background: var(--surface);
+  border-top: 1px solid var(--border-strong);
+}
+[data-theme="pixel"] .sheet-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+}
+[data-theme="pixel"] .sale-line {
+  border-bottom: 1px solid var(--border);
+}
+[data-theme="pixel"] .summary-row.total,
+[data-theme="pixel"] .receipt-total {
+  font-family: var(--font-display);
+  color: var(--accent);
+  border-top: 1px solid var(--border-strong);
+  padding-top: 8px;
+}
+[data-theme="pixel"] .section-title {
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+}
+[data-theme="pixel"] .section-title::after {
+  background: var(--border-strong);
+}
+[data-theme="pixel"] .badge {
+  border-radius: 0;
+}
+
+/* lists / inputs on dark */
+[data-theme="pixel"] .list-row {
+  border-bottom: 1px solid var(--border);
+}
+[data-theme="pixel"] input,
+[data-theme="pixel"] select,
+[data-theme="pixel"] textarea,
+[data-theme="pixel"] .search-box input {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  color: var(--text);
+}
+[data-theme="pixel"] input:focus,
+[data-theme="pixel"] textarea:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+[data-theme="pixel"] .empty-state .ob-ico {
+  color: var(--text-muted);
 }

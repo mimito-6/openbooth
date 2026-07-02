@@ -362,3 +362,79 @@
   border-color: var(--border-strong);
   outline: none;
 }
+
+/* ===== polish round: dot-matrix masthead + glyph furniture ===== */
+/* the title itself goes dot-matrix — CJK shop names too, via the
+   chunked DotGothic16 (per-glyph fallback to system if uncovered) */
+[data-theme="nothing"] .view.active:has(> .home-hero) .home-shop-name {
+  font-family: "DotGothic16", -apple-system, "PingFang TC", "Noto Sans TC", sans-serif;
+  font-weight: 400;
+  font-size: 32px;
+}
+/* dotted glyph ruler under the chip row, like Nothing's glyph sheets */
+[data-theme="nothing"] .view.active:has(> .home-hero) .ready-chip {
+  position: relative;
+}
+[data-theme="nothing"] .view.active:has(> .home-hero) .home-shop-name {
+  margin-top: 6px;
+}
+/* concentric glyph-ring cluster behind the mascot ring */
+[data-theme="nothing"] .view.active:has(> .home-hero) .home-mascot-fallback::before {
+  content: "";
+  position: absolute;
+  inset: -12px;
+  border: 1px dotted var(--border);
+  border-radius: 50%;
+}
+[data-theme="nothing"] .view.active:has(> .home-hero) .home-mascot-fallback::after {
+  content: "";
+  position: absolute;
+  inset: -24px;
+  border: 1px dotted var(--border);
+  border-radius: 50%;
+  opacity: 0.6;
+}
+/* wide-tracked wordmark micro-label above the title (Latin pseudo) */
+[data-theme="nothing"] .view.active:has(> .home-hero) .home-shop-name::before {
+  content: "OPENBOOTH (R)";
+  display: block;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.34em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+/* dot-leader rail between event line and stats */
+[data-theme="nothing"] .view.active:has(> .home-hero) .home-event-line {
+  font-family: "DotGothic16", -apple-system, "PingFang TC", "Noto Sans TC", sans-serif;
+}
+/* stats: label dots — red dot marks the money readout */
+[data-theme="nothing"] .stat-label {
+  position: relative;
+  padding-left: 10px;
+}
+[data-theme="nothing"] .stat-label::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--border-strong);
+}
+[data-theme="nothing"] .stat:first-child .stat-label::before {
+  background: var(--accent);
+}
+/* nav rows: dot leaders between name and index */
+[data-theme="nothing"] .nav-card .nav-name {
+  position: relative;
+}
+/* sheet titles pick up the dot face too */
+[data-theme="nothing"] .sheet-title,
+[data-theme="nothing"] .title {
+  font-family: "DotGothic16", -apple-system, "PingFang TC", "Noto Sans TC", sans-serif;
+  font-weight: 400;
+}

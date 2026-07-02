@@ -358,3 +358,66 @@
     animation: none;
   }
 }
+
+/* ===== polish round: designed masthead, dot-matrix hearts, page lace ===== */
+/* lace trim across the very top of the page */
+[data-theme="meido"] body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 10px;
+  z-index: 7;
+  pointer-events: none;
+  background: radial-gradient(circle 10px at 10px 0, var(--accent-light) 92%, transparent 94%);
+  background-size: 20px 10px;
+  background-repeat: repeat-x;
+}
+/* the ♡ marks: dot-matrix face (DotGothic16 has U+2661) — crisper, less mushy */
+[data-theme="meido"] .home-shop-name::before,
+[data-theme="meido"] .home-shop-name::after,
+[data-theme="meido"] .item-card.has-qty .item-name::after,
+[data-theme="meido"] .summary-row.total::before {
+  font-family: "DotGothic16", var(--font-display);
+  font-weight: 400;
+}
+/* masthead: shop name sits on a ribbon band with notched ends */
+[data-theme="meido"] .view.active:has(> .home-hero) .home-shop-name {
+  position: relative;
+  display: block;
+  width: fit-content;
+  justify-self: center;
+  margin: 6px auto 0;
+  padding: 9px 26px 10px;
+  background: var(--accent);
+  color: var(--on-accent);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 50%, 100% 100%, 0 100%, 12px 50%);
+  font-size: 23px;
+  box-shadow: none;
+}
+[data-theme="meido"] .view.active:has(> .home-hero) .home-shop-name::before,
+[data-theme="meido"] .view.active:has(> .home-hero) .home-shop-name::after {
+  color: var(--on-accent);
+}
+/* menu-board label on the stats card */
+[data-theme="meido"] .stats::after {
+  content: "MENU";
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font: 700 8px/1 var(--font-sans);
+  letter-spacing: 0.3em;
+  color: var(--accent);
+  opacity: 0.85;
+}
+/* sweeter section titles: little rosette dot before */
+[data-theme="meido"] .section-title::before {
+  content: "•";
+  color: var(--accent);
+  margin-right: 2px;
+}
+/* nav cards: alternate cream / rose-foam like a pastry case */
+[data-theme="meido"] .nav-card:nth-child(even) {
+  background: #fdf5f0;
+}
