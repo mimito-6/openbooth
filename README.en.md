@@ -49,7 +49,7 @@ The seven tiles on the home screen:
 - **💳 Payment (PAY)** — custom methods (cash / Line Pay / PayPay / …) + payment QR image
 - **📊 Records (RECORD)** — transactions, void/refund, product ranking, **cash-up reconciliation (starting float → expected vs counted)**, CSV export
 
-Plus: full JSON backup / restore, **one-link stall preset sharing**, customer-facing display, 繁中 / 日本語 / English / 한국어, 5 themes, installable offline PWA.
+Plus: full JSON backup / restore, **one-link stall preset sharing**, customer-facing display, 繁中 / 日本語 / English / 한국어, **18 switchable themes** (warm handmade through metallic-futuristic to dot-matrix pixel), installable offline PWA.
 
 ## 🧾 Receipt print / share (optional)
 

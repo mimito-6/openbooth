@@ -3,6 +3,41 @@
 All notable changes to OpenBooth are documented here.
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.3.0] — 2026-07
+
+A big design round: an inline-SVG icon system (no more emoji), a jump from
+5 to **18 switchable themes**, and a self-hosted pixel font with full
+Traditional-Chinese coverage.
+
+### Added
+- **18 themes**, up from 5. Beyond the original warm/handmade set:
+  - **Prototype design themes**: koishi (warm plaster / pebble claymorphism),
+    linen, graphite, sage, sabi (錆 wabi-sabi).
+  - **Metallic / futuristic**: titanium, gunmetal, chrome.
+  - **Reference-driven bold layouts (v2 round)**: folio, halftone, zine, spec,
+    pixel (THE SIGNAL black/yellow HUD).
+  - **Character themes**: meido (メイド café), nothing (Nothing-OS dot-matrix
+    minimal).
+- **Inline-SVG icon system** — a single set of crisp line icons rendered from
+  code, so icons stay sharp at any size and match each theme's ink colour.
+- **Cubic 11 (俐方體11號) pixel font** — an open-source (SIL OFL 1.1) Traditional
+  Chinese bitmap font covering Big5 level-1 (5401 glyphs) + 常用國字 + kana in a
+  single 400 KB woff2. The pixel-style themes now render full TC pixel glyphs
+  instead of falling back to the system font per character.
+
+### Changed
+- **All emoji removed app-wide**, replaced by the inline-SVG icons for a
+  consistent, theme-aware look.
+- Replaced the previous 123-chunk on-demand DotGothic16 setup (~1.1 MB across
+  123 files) with the single Cubic 11 woff2. Service-worker cache bumped to
+  `openbooth-v28`.
+
+### Fixed
+- Cart-detail sheet showing a black screen when reopened.
+- Double-modal trap after checkout.
+- Badge / quantity rows mis-rendering in the item grid.
+- Nav icons not centred in their wells; logo shifting position across themes.
+
 ## [0.2.0] — 2026-06
 
 Receipt printing / sharing, and booth numbers.
