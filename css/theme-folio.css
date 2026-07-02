@@ -564,6 +564,74 @@
   max-width: none;
 }
 
+/* ============================================================
+   Decorative pass — editorial print furniture (all Latin/geometry,
+   CJK-safe, pointer-events-free, static).
+   ============================================================ */
+/* registration crosses in opposite corners — the blueprint's "+" marks */
+[data-theme="folio"] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.55;
+  background-image:
+    linear-gradient(var(--accent), var(--accent)),
+    linear-gradient(var(--accent), var(--accent)),
+    linear-gradient(var(--accent), var(--accent)),
+    linear-gradient(var(--accent), var(--accent));
+  background-size: 14px 2px, 2px 14px, 14px 2px, 2px 14px;
+  background-position:
+    right 24px top 76px, right 30px top 70px,
+    left 24px bottom 36px, left 30px bottom 30px;
+  background-repeat: no-repeat;
+}
+/* micro-label kicker above the huge cobalt title */
+[data-theme="folio"] .view.active:has(> .home-hero) .home-shop-name::before {
+  content: "CATALOGUE";
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.22em; /* Latin-only pseudo content — safe */
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+/* stat chips get a cobalt corner tick — "measured" mark */
+[data-theme="folio"] .stat::after {
+  content: "";
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid var(--accent);
+  border-right: 2px solid var(--accent);
+  opacity: 0.7;
+}
+/* hero CTA reads as a printed instruction — trailing arrow */
+[data-theme="folio"] .open-stall-btn::after {
+  content: " →"; /* Latin arrow, safe next to CJK label */
+  font-weight: 700;
+}
+/* catalog colophon under the nav rows: barcode + imprint line */
+[data-theme="folio"] .view.active:has(> .home-hero) .nav-grid::after {
+  content: "OPENBOOTH \00AE  PRINTED IN CATALOG FORM";
+  display: block;
+  margin-top: 10px;
+  padding-top: 30px;
+  background: repeating-linear-gradient(90deg,
+      var(--text) 0 2px, transparent 2px 5px,
+      var(--text) 5px 6px, transparent 6px 12px,
+      var(--text) 12px 15px, transparent 15px 18px)
+    top left / 130px 22px no-repeat;
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.18em; /* Latin-only pseudo content — safe */
+  color: var(--text-muted);
+}
+
 /* fix: with a locked-column badge, auto-placement pushed icon/name to row 2 —
    pin every catalog-row cell explicitly */
 [data-theme="folio"] .nav-card::after {

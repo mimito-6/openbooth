@@ -31,9 +31,9 @@
 
 /* ---------- 1 · Token block (all 18 colors + structural overrides) ---------- */
 [data-theme="zine"] {
-  --bg: #eceae6; /* neutral gray-white paper (per owner: not yellow) */
-  --surface: #f7f6f3; /* whiter sticker stock */
-  --surface-2: #e0ded8; /* recessed gray */
+  --bg: #e9ebee; /* cool blue-gray paper — zero warm tint */
+  --surface: #f6f8fa; /* blue-white sticker stock */
+  --surface-2: #d9dde3; /* recessed cool gray */
   --border: #24242a; /* ink hairline (shape from ink, not tint) */
   --border-strong: #24242a; /* heavy ink */
   --text: #24242a; /* deep ink — 12.4:1 on cream */
@@ -42,7 +42,7 @@
   --accent: #c81e56; /* crimson-magenta — 5.6:1 on cream (large + chrome) */
   --accent-dark: #a41345; /* 7.6:1 — safe for small text / values */
   --accent-light: #fbe4ec; /* pale pink fill */
-  --on-accent: #fff6f0; /* warm white on magenta */
+  --on-accent: #ffffff; /* pure white on magenta — no warm cast */
   --success: #1f7a46;
   --success-light: #dff0e4;
   --combo: #2b58c8; /* royal ASCII blue — the second voice */
@@ -422,7 +422,7 @@
 [data-theme="zine"] .sheet {
   border: 2px solid var(--border-strong);
   border-bottom: none;
-  background: #f4f3ef; /* grey-white sheet base per owner feedback */
+  background: #f2f4f6; /* cool grey-white sheet base */
 }
 [data-theme="zine"] .sale-line {
   border-bottom: 1.5px dashed var(--border-strong);

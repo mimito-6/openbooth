@@ -33,7 +33,8 @@
   --combo-light: #e2e0f4;
   --danger: #c02a2a;
   --warning: #8a5a0e;
-  /* structural: very round pills, near-flat hairline shadows */
+  /* structural: very round pills; liquid-glass shadows — one soft
+     diffuse drop + a specular top highlight, never tight dark smudges */
   --font-sans: "Space Grotesk", -apple-system, BlinkMacSystemFont, "PingFang TC",
     "Hiragino Sans", "Noto Sans TC", "Noto Sans JP", sans-serif;
   --font-display: "Space Grotesk", -apple-system, "PingFang TC", "Noto Sans TC", sans-serif;
@@ -41,9 +42,14 @@
   --r-md: 16px;
   --r-lg: 20px;
   --r-xl: 24px;
-  --shadow-card: 0 1px 2px rgba(35, 38, 44, 0.08);
-  --shadow-float: 0 2px 6px rgba(35, 38, 44, 0.16);
-  --shadow-sheet: 0 -2px 10px rgba(35, 38, 44, 0.12);
+  --shadow-card: 0 8px 22px rgba(35, 38, 44, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  --shadow-float: 0 14px 34px rgba(35, 38, 44, 0.13),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  --shadow-sheet: 0 -10px 30px rgba(35, 38, 44, 0.12);
+  /* shared liquid-glass surface recipe */
+  --glass-bg: linear-gradient(160deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.42));
+  --glass-border: rgba(255, 255, 255, 0.72);
   /* reusable dot-matrix layer (regular grid, dark dots) */
   --ht-dot: radial-gradient(circle, rgba(35, 38, 44, 0.10) 1px, transparent 1.3px);
 }
@@ -123,9 +129,11 @@
 }
 [data-theme="halftone"] .nav-card {
   position: relative;
-  border: 1px solid var(--border);
+  border: 1px solid var(--glass-border);
   border-radius: var(--r-xl);
-  background: linear-gradient(160deg, #f1f3f6, #dfe2e8);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4);
+  backdrop-filter: blur(12px) saturate(1.4);
   box-shadow: var(--shadow-card);
   padding: 20px 12px 22px;
   overflow: hidden;
@@ -192,8 +200,10 @@
    5. STATS — "date pill" motif: rounded pills, COBALT numerals.
    --------------------------------------------------------------- */
 [data-theme="halftone"] .stat {
-  background: linear-gradient(160deg, #f1f3f6, #e2e5ea);
-  border: 1px solid var(--border);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4);
+  backdrop-filter: blur(12px) saturate(1.4);
+  border: 1px solid var(--glass-border);
   border-radius: var(--r-pill);
   box-shadow: var(--shadow-card);
   padding: 12px 16px;
@@ -238,7 +248,9 @@
   font-size: 19px;
   letter-spacing: 0.01em;
   padding: 22px;
-  box-shadow: 0 2px 8px rgba(24, 47, 158, 0.28);
+  /* cobalt glass: lifted bloom shadow + specular top edge */
+  box-shadow: 0 10px 26px rgba(24, 47, 158, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 [data-theme="halftone"] .open-stall-btn:active {
   transform: translateY(1px) scale(0.99);
@@ -269,8 +281,10 @@
    has-qty = pale-blue fill + cobalt hairline + cobalt price
    --------------------------------------------------------------- */
 [data-theme="halftone"] .item-card {
-  background: linear-gradient(165deg, #f1f3f6, #e4e7ec);
-  border: 1px solid var(--border);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(10px) saturate(1.35);
+  backdrop-filter: blur(10px) saturate(1.35);
+  border: 1px solid var(--glass-border);
   border-radius: var(--r-lg);
   box-shadow: var(--shadow-card);
   overflow: hidden;
@@ -323,10 +337,11 @@
    9. SALE BAR — silver panel, top hairline, COBALT total, cobalt CTA.
    --------------------------------------------------------------- */
 [data-theme="halftone"] .sale-bar {
-  background: linear-gradient(180deg, #eef0f4, #d8dbe1);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.55));
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  backdrop-filter: blur(18px) saturate(1.5);
   color: var(--text);
-  border: 1px solid var(--border);
-  border-top: 1px solid var(--border-strong);
+  border: 1px solid var(--glass-border);
   border-radius: var(--r-xl);
   box-shadow: var(--shadow-float);
 }
@@ -429,8 +444,12 @@
    12. SHEET — silver panel to match
    --------------------------------------------------------------- */
 [data-theme="halftone"] .sheet {
-  background: linear-gradient(180deg, #eef0f4, #e0e3e9);
+  background: linear-gradient(180deg, rgba(248, 249, 252, 0.92), rgba(238, 240, 244, 0.88));
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  backdrop-filter: blur(20px) saturate(1.4);
+  border-top: 1px solid var(--glass-border);
   border-radius: var(--r-xl) var(--r-xl) 0 0;
+  box-shadow: var(--shadow-sheet), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 [data-theme="halftone"] .summary-row.total {
   color: var(--text);
@@ -534,7 +553,8 @@
   padding: 22px 14px 30px;
 }
 
-/* --- material push: denser halftone + brighter metal ramp --- */
+/* --- material push: brighter metal ramp; halftone stays a whisper
+   BEHIND the glass (was z-index 6 over the cards — read as grime) --- */
 [data-theme="halftone"] body {
   background: linear-gradient(175deg, #f0f2f6 0%, #d6d9e0 46%, #e6e8ee 72%, #c9ccd4 100%);
 }
@@ -543,12 +563,25 @@
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 6;
-  opacity: 0.85;
-  background-image: radial-gradient(circle, rgba(35, 38, 44, 0.16) 1px, transparent 1.4px);
+  z-index: 0;
+  opacity: 0.5;
+  background-image: radial-gradient(circle, rgba(35, 38, 44, 0.12) 1px, transparent 1.4px);
   background-size: 6px 6px;
-  -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.25) 34%, rgba(0, 0, 0, 0.12) 55%, rgba(0, 0, 0, 0.75) 100%);
-  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.25) 34%, rgba(0, 0, 0, 0.12) 55%, rgba(0, 0, 0, 0.75) 100%);
+  -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.3) 40%, transparent 70%, rgba(0, 0, 0, 0.55) 100%);
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.3) 40%, transparent 70%, rgba(0, 0, 0, 0.55) 100%);
+}
+/* decorative light: a cobalt bloom top-right + cool sheen lower-left,
+   sitting under everything — gives the glass something to refract */
+[data-theme="halftone"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background-image:
+    radial-gradient(circle 340px at 88% 6%, rgba(34, 68, 212, 0.14), transparent 68%),
+    radial-gradient(circle 300px at 6% 82%, rgba(255, 255, 255, 0.55), transparent 70%),
+    radial-gradient(circle 200px at 70% 55%, rgba(75, 65, 168, 0.06), transparent 70%);
 }
 
 /* fix: auto side-margins on grid items absorb free space and shrink them
@@ -558,4 +591,40 @@
   margin: 0;
   width: 100%;
   max-width: none;
+}
+
+/* --- liquid-glass decorations --------------------------------- */
+/* mascot sits inside a floating glass lens */
+[data-theme="halftone"] .view.active:has(> .home-hero) .home-mascot-fallback {
+  padding: 10px;
+  border-radius: 50%;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  -webkit-backdrop-filter: blur(10px) saturate(1.4);
+  backdrop-filter: blur(10px) saturate(1.4);
+  box-shadow: var(--shadow-card);
+}
+/* ready-chip becomes a small glass capsule */
+[data-theme="halftone"] .ready-chip {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  -webkit-backdrop-filter: blur(10px) saturate(1.4);
+  backdrop-filter: blur(10px) saturate(1.4);
+  box-shadow: var(--shadow-card);
+}
+/* nav icon disc: frosted instead of flat silver */
+[data-theme="halftone"] .nav-card .nav-emoji.nav-ico {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.5));
+  border-color: var(--glass-border);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 2px 6px rgba(35, 38, 44, 0.06);
+}
+/* poster title picks up a faint cobalt dot-rail underline echo */
+[data-theme="halftone"] .view.active:has(> .home-hero) .home-event-line {
+  border-bottom: none;
+  background-image: radial-gradient(circle, var(--border-strong) 1.4px, transparent 1.8px);
+  background-size: 9px 4px;
+  background-position: left bottom;
+  background-repeat: repeat-x;
+  padding-bottom: 12px;
 }
