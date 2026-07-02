@@ -1,0 +1,555 @@
+/* ============================================================
+   OpenBooth — Theme "pixel" (Studio Innate techwear label)
+   The app becomes a garment care-label: near-monochrome slate
+   ink on pale periwinkle, chunky PIXEL display numerals, barcode
+   blocks, diagonal hazard-stripe dividers, ™®© micro-marks, and
+   inverse-video press states as the core interaction.
+   All selectors scoped to [data-theme="pixel"].
+   ------------------------------------------------------------
+   AA notes (single ink = --accent #3a4150):
+     ink #343b4e on bg   #e2e5f0 ≈ 7.9:1   (body / money)  PASS
+     ink #343b4e on surf #ecEEf7 ≈ 8.6:1                    PASS
+     paper #eef0f8 on ink #3a4150 ≈ 8.0:1 (inverse video)   PASS
+     secondary #6a7188 on surface ≈ 4.6:1 (labels)          PASS
+     muted #949bb0 = decoration/hairlines only — never money
+   ============================================================ */
+
+/* ---- new display face: chunky pixel, Latin + digits only ---- */
+@font-face {
+  font-family: "Silkscreen";
+  font-weight: 400;
+  src: url("../fonts/silkscreen-latin.woff2") format("woff2");
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+2000-206F, U+20AC, U+2122,
+    U+2212, U+FEFF;
+}
+
+/* ============================================================
+   1 · TOKEN BLOCK — self-contained near-monochrome palette
+   ============================================================ */
+[data-theme="pixel"] {
+  --bg: #e2e5f0; /* periwinkle sheet */
+  --surface: #ecEEf7; /* lighter panel */
+  --surface-2: #d3d7e6; /* recessed / stripe field */
+  --border: #b9c0d6; /* hairline */
+  --border-strong: #3a4150; /* THE INK — hard rules */
+  --text: #343b4e; /* slate ink 7.9:1 */
+  --text-secondary: #6a7188; /* 4.6:1 labels */
+  --text-muted: #949bb0; /* decoration/hairline only */
+  --accent: #3a4150; /* accent IS the ink — mono */
+  --accent-dark: #272d3d;
+  --accent-light: #cdd2e4; /* pale ink wash */
+  --on-accent: #eef0f8; /* paper on ink 8.0:1 */
+  --success: #4f7264; /* muted, holds the mono field */
+  --success-light: #dde6e1;
+  --combo: #5c6683;
+  --combo-light: #dee1ec;
+  --danger: #9c5454;
+  --warning: #8b7748;
+  /* structural: body-latin grotesk, hard 2px pixel corners, flat */
+  --font-sans: "Space Grotesk", -apple-system, BlinkMacSystemFont, "PingFang TC",
+    "Hiragino Sans", "Noto Sans TC", "Noto Sans JP", sans-serif;
+  --font-display: "Space Grotesk", -apple-system, "PingFang TC", "Noto Sans TC",
+    sans-serif;
+  --r-sm: 2px;
+  --r-md: 2px;
+  --r-lg: 2px;
+  --r-xl: 3px;
+  --shadow-card: none;
+  --shadow-float: none;
+  --shadow-sheet: 0 -10px 34px rgba(39, 45, 61, 0.22);
+  /* reusable ink patterns */
+  --pix-hazard: repeating-linear-gradient(
+    45deg,
+    var(--accent) 0 8px,
+    transparent 8px 16px
+  );
+  --pix-barcode: repeating-linear-gradient(
+    90deg,
+    var(--accent) 0 2px,
+    transparent 2px 5px,
+    var(--accent) 5px 6px,
+    transparent 6px 9px,
+    var(--accent) 9px 12px,
+    transparent 12px 14px
+  );
+}
+
+/* ============================================================
+   2 · DISPLAY TYPE — Silkscreen pixel numerals (≥15px only)
+   Latin digits render pixel; CJK shop names fall to system bold.
+   ============================================================ */
+[data-theme="pixel"] .stat-value,
+[data-theme="pixel"] .item-price,
+[data-theme="pixel"] .sale-bar-total,
+[data-theme="pixel"] .sale-line-total,
+[data-theme="pixel"] .summary-row.total,
+[data-theme="pixel"] .receipt-total {
+  font-family: "Silkscreen", var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+/* enforce the ≥15px legibility floor on every pixel readout */
+[data-theme="pixel"] .stat-value {
+  font-size: 21px;
+}
+[data-theme="pixel"] .stat-value.small {
+  font-size: 16px;
+}
+[data-theme="pixel"] .item-price {
+  font-size: 18px;
+  color: var(--text);
+}
+[data-theme="pixel"] .sale-bar-total {
+  font-size: 22px;
+}
+[data-theme="pixel"] .stat-value .unit,
+[data-theme="pixel"] .item-price .pcs {
+  font-family: var(--font-sans); /* tiny units stay grotesk (readable) */
+}
+/* shop name: pixel ONLY if Latin (CJK auto-falls to system bold — acceptable) */
+[data-theme="pixel"] .home-shop-name {
+  font-family: "Silkscreen", var(--font-display);
+  font-weight: 400;
+  font-size: 20px;
+  letter-spacing: 0.01em;
+  line-height: 1.25;
+}
+/* micro-labels: grotesk, wide tracking (Latin-safe, applied to Latin fields) */
+[data-theme="pixel"] .stat-label,
+[data-theme="pixel"] .home-event-line {
+  font-family: var(--font-sans);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 10px;
+}
+
+/* ============================================================
+   3 · HAZARD-STRIPE DIVIDERS — ◢◢◢ diagonal ink bands
+   ============================================================ */
+[data-theme="pixel"] .section-title::after {
+  content: "";
+  flex: 1;
+  height: 8px;
+  background: var(--pix-hazard);
+  opacity: 0.85;
+}
+[data-theme="pixel"] .section-title {
+  color: var(--text);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+
+/* ============================================================
+   4 · HOME HERO — care-label sheet: ™ mark + barcode strip
+   ============================================================ */
+[data-theme="pixel"] .home-hero {
+  position: relative;
+  border: 2px solid var(--accent);
+  background: var(--surface);
+  margin: 14px 16px 4px;
+  padding: 22px 20px 18px;
+  max-width: 560px;
+}
+/* trademark micro-mark after the shop name (Latin symbol — CJK-safe) */
+[data-theme="pixel"] .home-shop-name::after {
+  content: " \2122"; /* ™ */
+  font-family: var(--font-sans);
+  font-size: 0.5em;
+  vertical-align: super;
+  color: var(--text-secondary);
+}
+/* corner coordinate micro-label — Latin/digits/symbols only */
+[data-theme="pixel"] .home-hero::before {
+  content: "51.40\B0N \2014 1.32\B0W";
+  position: absolute;
+  top: 7px;
+  left: 9px;
+  font-family: var(--font-sans);
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+/* BARCODE strip under the hero — repeating-linear-gradient block */
+[data-theme="pixel"] .home-hero::after {
+  content: "";
+  display: block;
+  width: 60%;
+  max-width: 260px;
+  height: 28px;
+  margin: 14px auto 0;
+  background: var(--pix-barcode);
+  background-repeat: repeat-x;
+}
+/* scan sweep: 1px paper line crosses the barcode once on load */
+[data-theme="pixel"] .home-hero {
+  overflow: hidden;
+}
+[data-theme="pixel"] .view.active .home-hero::after {
+  animation: pixel-scan 0.6s ease-out 0.15s 1 both;
+}
+@keyframes pixel-scan {
+  0% {
+    box-shadow: inset -100% 0 0 -2px rgba(236, 238, 247, 0.9);
+  }
+  100% {
+    box-shadow: inset 100% 0 0 -2px rgba(236, 238, 247, 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="pixel"] .view.active .home-hero::after {
+    animation: none;
+  }
+}
+
+/* ============================================================
+   5 · NAV CARDS — flat panels, pixel-notched corners, counters
+   :active = INVERSE VIDEO (the theme's signature interaction)
+   ============================================================ */
+[data-theme="pixel"] .nav-grid {
+  gap: 12px;
+}
+[data-theme="pixel"] .nav-card {
+  position: relative;
+  background: var(--surface);
+  border: 2px solid var(--accent);
+  box-shadow: none;
+  padding: 18px 10px 20px;
+  /* pixel silhouette: 4px stepped notches cut off each corner */
+  clip-path: polygon(0 4px, 4px 4px, 4px 0, calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px));
+  transition: background 0.08s steps(1), color 0.08s steps(1);
+}
+[data-theme="pixel"] .nav-card:active {
+  background: var(--accent); /* inverse video: ink fill */
+  border-color: var(--accent);
+}
+[data-theme="pixel"] .nav-card:active .nav-ico,
+[data-theme="pixel"] .nav-card:active .nav-name,
+[data-theme="pixel"] .nav-card:active .nav-name::after {
+  color: var(--on-accent); /* paper text/icon */
+}
+[data-theme="pixel"] .nav-card .nav-ico {
+  color: var(--accent);
+}
+[data-theme="pixel"] .nav-card .nav-emoji.nav-ico .ob-ico {
+  width: 30px;
+  height: 30px;
+  stroke-width: 2.25;
+}
+[data-theme="pixel"] .nav-card .nav-name {
+  color: var(--text);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+}
+/* CSS counter "_01…_06" micro index (Latin/digits only) */
+[data-theme="pixel"] .nav-grid {
+  counter-reset: pixnav;
+}
+[data-theme="pixel"] .nav-card {
+  counter-increment: pixnav;
+}
+[data-theme="pixel"] .nav-card .nav-name::after {
+  content: "_0" counter(pixnav);
+  display: block;
+  margin-top: 4px;
+  font-family: var(--font-sans);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+/* ============================================================
+   6 · STAT ROWS — label/data rows, hairline ink rules, ® mark
+   ============================================================ */
+[data-theme="pixel"] .stat {
+  position: relative;
+  background: var(--surface);
+  border: none;
+  border-top: 2px solid var(--accent);
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  box-shadow: none;
+  padding: 9px 12px 11px;
+}
+[data-theme="pixel"] .stat-label {
+  color: var(--text-secondary);
+}
+/* tiny registered-mark globe on the first stat (Latin symbol) */
+[data-theme="pixel"] .stats .stat:first-child::after {
+  content: "\00AE"; /* ® */
+  position: absolute;
+  top: 7px;
+  right: 8px;
+  font-family: var(--font-sans);
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+/* ============================================================
+   7 · OPEN-STALL BUTTON — solid ink block, notched, inverse flash
+   ============================================================ */
+[data-theme="pixel"] .open-stall-btn {
+  background: var(--accent);
+  color: var(--on-accent);
+  border: 2px solid var(--accent);
+  border-radius: 0;
+  box-shadow: none;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 19px 20px;
+  clip-path: polygon(0 5px, 5px 5px, 5px 0, calc(100% - 5px) 0, calc(100% - 5px) 5px, 100% 5px, 100% calc(100% - 5px), calc(100% - 5px) calc(100% - 5px), calc(100% - 5px) 100%, 5px 100%, 5px calc(100% - 5px), 0 calc(100% - 5px));
+  transition: background 0.08s steps(1), color 0.08s steps(1);
+}
+[data-theme="pixel"] .open-stall-btn:active {
+  transform: none;
+  background: var(--bg); /* inverse flash: paper fill */
+  color: var(--accent); /* ink text */
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+/* ============================================================
+   8 · TABS — rectangle chips, inverse-video active
+   ============================================================ */
+[data-theme="pixel"] .tab {
+  background: var(--surface);
+  color: var(--text);
+  border: 1.5px solid var(--accent);
+  border-radius: var(--r-sm);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  transition: background 0.08s steps(1), color 0.08s steps(1);
+}
+[data-theme="pixel"] .tab.active {
+  background: var(--accent); /* inverse video */
+  color: var(--on-accent);
+  border-color: var(--accent);
+}
+[data-theme="pixel"] .tab:active {
+  transform: translateY(1px);
+}
+
+/* ============================================================
+   9 · ITEM CARDS — panel + ink border; has-qty = inverse header
+   ============================================================ */
+[data-theme="pixel"] .item-card {
+  background: var(--surface);
+  border: 1.5px solid var(--accent);
+  border-radius: var(--r-sm);
+  box-shadow: none;
+  transition: background 0.08s steps(1), border-color 0.08s steps(1),
+    transform 0.06s;
+}
+[data-theme="pixel"] .item-card:active {
+  transform: translateY(1px);
+  background: var(--accent);
+}
+[data-theme="pixel"] .item-card:active .item-name,
+[data-theme="pixel"] .item-card:active .item-price,
+[data-theme="pixel"] .item-card:active .item-bundle {
+  color: var(--on-accent); /* inverse video on press */
+}
+[data-theme="pixel"] .item-card.has-qty {
+  background: var(--accent-light);
+  border: 3px solid var(--accent);
+}
+[data-theme="pixel"] .item-name {
+  color: var(--text);
+  font-weight: 700;
+}
+[data-theme="pixel"] .item-bundle {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+/* qty badge = ink square with paper pixel digit */
+[data-theme="pixel"] .qty-badge {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-radius: 0;
+  box-shadow: 0 0 0 2px var(--surface);
+  font-family: "Silkscreen", var(--font-display);
+  font-weight: 400;
+  font-size: 15px; /* pixel digit ≥15px */
+  min-width: 26px;
+  height: 26px;
+}
+[data-theme="pixel"] .item-card.combo {
+  border-color: var(--combo);
+}
+[data-theme="pixel"] .item-card.combo.has-qty {
+  border-color: var(--combo);
+  background: var(--combo-light);
+}
+[data-theme="pixel"] .item-card.combo .qty-badge {
+  background: var(--combo);
+}
+
+/* ============================================================
+   10 · SALE BAR — paper bar, hazard-stripe top edge, ink CTA
+   ============================================================ */
+[data-theme="pixel"] .sale-bar {
+  position: fixed;
+  background: var(--surface);
+  color: var(--text);
+  border: 2px solid var(--accent);
+  border-radius: var(--r-sm);
+  box-shadow: none;
+  overflow: hidden;
+}
+[data-theme="pixel"] .sale-bar::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: var(--pix-hazard);
+  opacity: 0.9;
+}
+[data-theme="pixel"] .sale-bar-count {
+  color: var(--text-secondary);
+  opacity: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 10px;
+}
+[data-theme="pixel"] .sale-bar-total {
+  color: var(--text);
+}
+[data-theme="pixel"] .sale-bar-cta {
+  background: var(--accent); /* solid ink block */
+  color: var(--on-accent);
+  border-radius: var(--r-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+[data-theme="pixel"] .sale-bar:active {
+  transform: scale(0.99);
+}
+
+/* ============================================================
+   11 · SHEET — top hazard stripe + "C:\>" title prefix
+   ============================================================ */
+[data-theme="pixel"] .sheet {
+  background: var(--bg);
+  border: 2px solid var(--accent);
+  border-bottom: none;
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+}
+[data-theme="pixel"] .sheet-header {
+  position: relative;
+}
+[data-theme="pixel"] .sheet-header::after {
+  content: "";
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 2px;
+  height: 8px;
+  background: var(--pix-hazard);
+  opacity: 0.8;
+}
+[data-theme="pixel"] .sheet-title::before {
+  content: "C:\\> "; /* decorative terminal prefix (Latin/symbols) */
+  font-family: var(--font-sans);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+[data-theme="pixel"] .sheet-handle {
+  background: var(--accent);
+  border-radius: 0;
+  width: 44px;
+  height: 3px;
+}
+[data-theme="pixel"] .sheet-close {
+  background: var(--surface);
+  border: 1.5px solid var(--accent);
+  border-radius: 0;
+  color: var(--text);
+}
+[data-theme="pixel"] .sheet-close:active {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+/* ============================================================
+   12 · BUTTONS / BADGES / INPUTS — flat ink, inverse press
+   ============================================================ */
+[data-theme="pixel"] .btn-primary {
+  background: var(--accent);
+  color: var(--on-accent);
+  border: 2px solid var(--accent);
+  border-radius: var(--r-sm);
+  box-shadow: none;
+  letter-spacing: 0.04em;
+  transition: background 0.08s steps(1), color 0.08s steps(1);
+}
+[data-theme="pixel"] .btn-primary:active {
+  transform: translateY(1px);
+  background: var(--bg);
+  color: var(--accent);
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+[data-theme="pixel"] .btn-secondary {
+  background: var(--surface);
+  color: var(--text);
+  border: 1.5px solid var(--accent);
+  border-radius: var(--r-sm);
+}
+[data-theme="pixel"] .btn-secondary:active {
+  transform: translateY(1px);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+[data-theme="pixel"] .btn-success:active {
+  transform: translateY(1px);
+}
+[data-theme="pixel"] .badge,
+[data-theme="pixel"] .nav-badge {
+  border-radius: var(--r-sm);
+  border: 1.5px solid var(--accent);
+  font-weight: 700;
+}
+[data-theme="pixel"] .search-box input,
+[data-theme="pixel"] input,
+[data-theme="pixel"] select,
+[data-theme="pixel"] textarea {
+  border-radius: var(--r-sm);
+  border: 1.5px solid var(--border-strong);
+  background: var(--surface);
+}
+/* ready chip: flat, rectangular */
+[data-theme="pixel"] .ready-chip {
+  border-radius: var(--r-sm);
+  border: 1.5px solid var(--border);
+  box-shadow: none;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 10px;
+}
+[data-theme="pixel"] .pay-chip {
+  border-radius: var(--r-sm);
+  border: 1.5px solid var(--accent);
+}
+[data-theme="pixel"] .pay-chip.active {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+[data-theme="pixel"] .mini-btn {
+  border-radius: var(--r-sm);
+}
+[data-theme="pixel"] .mini-btn.active {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent);
+}
+
+/* summary total row: pixel numerals already applied; add ink rule */
+[data-theme="pixel"] .summary-row.total {
+  border-top: 2px solid var(--accent);
+}

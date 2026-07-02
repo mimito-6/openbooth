@@ -1,0 +1,523 @@
+/* ============================================================
+   OpenBooth — Theme "spec" (Industrial Tech-Document / Blueprint)
+   Ref: PRG 01 / AI U.S.A — safety-orange filled bars, ultra-heavy
+   black display type, faint engineering grid, "+" reg crosses,
+   crop-mark brackets, micro spec-labels, black clearance chips.
+   All selectors prefixed [data-theme="spec"]. Self-contained tokens.
+   AA: orange = FILL under BLACK ink or large graphics only; body +
+   prices are ink. CJK-safe (Latin micro-labels via ::pseudo only).
+   Perf: transform/opacity presses; grid via fixed pseudo gradients;
+   no backdrop-filter; reduced-motion gated.
+   ============================================================ */
+
+/* ---- New display face (Latin subset only; CJK falls back heavy) ---- */
+@font-face {
+  font-family: "Archivo Black";
+  font-weight: 400;
+  src: url("../fonts/archivo-black-latin.woff2") format("woff2");
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+2000-206F, U+20AC,
+    U+2122, U+2212, U+FEFF;
+}
+
+/* ===== 1 · TOKEN BLOCK — all 18 colors + structural overrides ===== */
+[data-theme="spec"] {
+  --bg: #f6f5f1; /* off-white paper */
+  --surface: #fdfdfb; /* document white */
+  --surface-2: #eceae3; /* recessed paper */
+  --border: #d9d7cf; /* faint rule */
+  --border-strong: #171715; /* ink rule — 15:1 on paper */
+  --text: #171715; /* near-black ink */
+  --text-secondary: #56544d; /* 7.3:1 — labels */
+  --text-muted: #8c8a82; /* 3.2:1 — decoration/codes only */
+  --accent: #e84e14; /* safety orange — FILLS + large graphics */
+  --accent-dark: #c23c0a; /* orange text ONLY when >=18px bold */
+  --accent-light: #fde4d8; /* pale orange fill (has-qty wash) */
+  --on-accent: #17170f; /* BLACK on orange — never white */
+  --success: #1f6b43;
+  --success-light: #e2efe6;
+  --combo: #234ba0;
+  --combo-light: #e2e8f6;
+  --danger: #c0392b;
+  --warning: #8a5a0f;
+
+  /* display = Archivo Black -> heavy system sans for CJK; body = grotesk */
+  --font-sans: "Space Grotesk", -apple-system, BlinkMacSystemFont, "PingFang TC",
+    "Hiragino Sans", "Noto Sans TC", "Noto Sans JP", sans-serif;
+  --font-display: "Archivo Black", -apple-system, "PingFang TC", "Hiragino Sans",
+    "Noto Sans TC", "Noto Sans JP", sans-serif;
+
+  /* sharp, print-flat */
+  --r-sm: 2px;
+  --r-md: 3px;
+  --r-lg: 4px;
+  --r-xl: 6px;
+  --shadow-card: none;
+  --shadow-float: 0 0 0 1.5px var(--border-strong);
+  --shadow-sheet: 0 -2px 0 var(--border-strong);
+
+  /* signature timing: mechanical, no easing */
+  --spec-flash: 90ms linear;
+}
+
+/* CJK heading safety: display face is applied broadly, but any node that
+   may carry CJK must NOT get uppercase or wide tracking (handled per rule
+   below — decorative Latin comes only from ::pseudo content). */
+
+/* ===== 2 · ENGINEERING GRID + REGISTRATION CROSSES (fixed, cheap) ===== */
+[data-theme="spec"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  /* faint hairline engineering grid ONLY — the original third "tick" layer
+     (background-size 44px 1px + default repeat) tiled vertically every 1px
+     and rendered as solid grey bars, so it was removed; the "+" registration
+     crosses live on the cards instead. */
+  background-image:
+    repeating-linear-gradient(to right, rgba(23, 23, 21, 0.045) 0 1px, transparent 1px 44px),
+    repeating-linear-gradient(to bottom, rgba(23, 23, 21, 0.045) 0 1px, transparent 1px 44px);
+  background-size: 44px 44px, 44px 44px;
+  opacity: 0.9;
+}
+/* content sits above the grid */
+[data-theme="spec"] .view,
+[data-theme="spec"] .header,
+[data-theme="spec"] .sale-bar,
+[data-theme="spec"] .sheet {
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== 3 · TABULAR FIGURES — non-reflowing money everywhere ===== */
+[data-theme="spec"] .stat-value,
+[data-theme="spec"] .item-price,
+[data-theme="spec"] .sale-bar-total,
+[data-theme="spec"] .sale-bar-count,
+[data-theme="spec"] .sale-line-total,
+[data-theme="spec"] .summary-row,
+[data-theme="spec"] .receipt-total,
+[data-theme="spec"] .cash-confirm,
+[data-theme="spec"] input[inputmode="numeric"] {
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1, "zero" 1;
+}
+
+/* Giant industrial display numbers */
+[data-theme="spec"] .home-shop-name,
+[data-theme="spec"] .stat-value,
+[data-theme="spec"] .item-price,
+[data-theme="spec"] .sale-bar-total {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+  line-height: 1.02;
+}
+
+/* ===== 4 · DOCUMENT HEADER — white sheet, 2px ink rule, corner code ===== */
+[data-theme="spec"] .header {
+  background: var(--surface);
+  border-bottom: 2px solid var(--border-strong);
+}
+/* decorative Latin micro-label top-right (::after — CJK-safe) */
+[data-theme="spec"] .header-top {
+  position: relative;
+}
+[data-theme="spec"] .header-top::after {
+  content: "OPENBOOTH · POS";
+  position: absolute;
+  top: -2px;
+  right: 0;
+  font: 700 8px/1 var(--font-sans);
+  letter-spacing: 0.24em;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+/* ===== 5 · THE ORANGE BAR — open-stall = safety-orange headline bar ===== */
+[data-theme="spec"] .open-stall-btn {
+  background: var(--accent);
+  color: var(--on-accent); /* BLACK ink on orange */
+  font-family: var(--font-display);
+  border: 2px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  box-shadow: none;
+  position: relative;
+  /* Latin-safe label text is Chinese here -> no uppercase/tracking */
+}
+/* crop-mark bracket + spec code framing the bar (Latin ::pseudo only) */
+[data-theme="spec"] .open-stall-btn::before,
+[data-theme="spec"] .open-stall-btn::after {
+  position: absolute;
+  top: 5px;
+  font: 700 8px/1 var(--font-sans);
+  letter-spacing: 0.2em;
+  color: var(--on-accent);
+  opacity: 0.72;
+}
+[data-theme="spec"] .open-stall-btn::before {
+  content: "▶ SPEC · 07.4";
+  left: 8px;
+}
+[data-theme="spec"] .open-stall-btn::after {
+  content: "AD-47";
+  right: 8px;
+}
+/* press = mechanical ink flash (bg->ink, text->orange) */
+[data-theme="spec"] .open-stall-btn:active {
+  transform: translateY(1px);
+  background: var(--border-strong);
+  color: var(--accent);
+  transition: background var(--spec-flash), color var(--spec-flash);
+}
+
+/* ===== 6 · NAV TILES — white spec panels, corner "+" crosses, "01" codes ===== */
+[data-theme="spec"] .nav-grid {
+  counter-reset: navidx;
+}
+[data-theme="spec"] .nav-card {
+  counter-increment: navidx;
+  background: var(--surface);
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  box-shadow: none;
+  position: relative;
+  overflow: hidden;
+  transition: transform var(--spec-flash), background var(--spec-flash);
+}
+[data-theme="spec"] .nav-card .nav-ico {
+  color: var(--text); /* icons stay ink, not accent */
+}
+[data-theme="spec"] .nav-card .nav-name {
+  font-weight: 700;
+}
+/* sequence code "01"–"06" top-right (numbers = Latin-safe) */
+[data-theme="spec"] .nav-card::after {
+  content: "NO." counter(navidx, decimal-leading-zero);
+  position: absolute;
+  top: 6px;
+  right: 7px;
+  font: 700 8px/1 var(--font-sans);
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+  opacity: 0;
+  animation: spec-fade 0.3s ease-out 0.05s forwards;
+}
+/* "+" registration crosses at top-left & bottom-right corners */
+[data-theme="spec"] .nav-card::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 9px;
+  height: 9px;
+  background:
+    linear-gradient(var(--border-strong), var(--border-strong)) center / 9px 1px no-repeat,
+    linear-gradient(var(--border-strong), var(--border-strong)) center / 1px 9px no-repeat;
+  opacity: 0;
+  animation: spec-fade 0.3s ease-out 0.1s forwards;
+}
+/* badge-wrapped tiles already show a red count top-right; nudge code down */
+[data-theme="spec"] .nav-card.badge-wrap::after {
+  top: 30px;
+}
+/* :active = orange fill flash (icon/text stay ink) */
+[data-theme="spec"] .nav-card:active {
+  transform: translateY(1px);
+  background: var(--accent);
+}
+[data-theme="spec"] .nav-card:active .nav-ico,
+[data-theme="spec"] .nav-card:active .nav-name,
+[data-theme="spec"] .nav-card:active .nav-code {
+  color: var(--on-accent);
+}
+
+/* nav badge -> black clearance chip (white micro text) */
+[data-theme="spec"] .nav-badge {
+  background: var(--border-strong);
+  color: #ffffff;
+  border-radius: var(--r-sm);
+  letter-spacing: 0.04em;
+}
+
+/* ===== 7 · STATS — spec-table strip, big ink values, "R1" row code ===== */
+[data-theme="spec"] .stat {
+  background: var(--surface);
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  box-shadow: none;
+  position: relative;
+}
+[data-theme="spec"] .stat-value {
+  font-weight: 400; /* Archivo Black is already ultra-heavy */
+  color: var(--text);
+}
+[data-theme="spec"] .stat-label {
+  color: var(--text-secondary);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+/* decorative revision code, bottom-right (Latin ::after) */
+[data-theme="spec"] .stat::after {
+  content: "R1";
+  position: absolute;
+  bottom: 4px;
+  right: 6px;
+  font: 700 7px/1 var(--font-sans);
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+/* ===== 8 · TABS — rectangular ink-outline chips; active = ink fill ===== */
+[data-theme="spec"] .tab {
+  background: var(--surface);
+  color: var(--text);
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  font-weight: 700;
+  transition: transform var(--spec-flash), background var(--spec-flash);
+}
+[data-theme="spec"] .tab.active {
+  background: var(--border-strong);
+  color: var(--surface);
+  border-color: var(--border-strong);
+}
+[data-theme="spec"] .tab:active {
+  transform: translateY(1px);
+}
+
+/* ===== 9 · ITEM CARDS — ink hairline; has-qty = orange clearance unit ===== */
+[data-theme="spec"] .item-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  box-shadow: none;
+  position: relative;
+  transition: transform var(--spec-flash);
+}
+[data-theme="spec"] .item-card:active {
+  transform: translate(1px, 1px);
+}
+[data-theme="spec"] .item-price {
+  font-weight: 400; /* display face carries the weight */
+  color: var(--text); /* ink, not orange (AA) */
+}
+/* selected = orange 3px border + pale wash (the "unit selected" state) */
+[data-theme="spec"] .item-card.has-qty {
+  border: 3px solid var(--accent);
+  background: var(--accent-light);
+}
+/* qty badge = black clearance chip (white micro number) */
+[data-theme="spec"] .item-card .qty-badge {
+  background: var(--border-strong);
+  color: #ffffff;
+  border-radius: var(--r-sm);
+  font-weight: 700;
+}
+/* sold-out unit — grey ink, restricted */
+[data-theme="spec"] .item-card.sold-out {
+  opacity: 0.55;
+}
+/* combo letter chip -> ink clearance chip */
+[data-theme="spec"] .combo-letter {
+  background: var(--combo);
+  border-radius: var(--r-sm);
+}
+
+/* ===== 10 · SALE BAR — orange footer bar (the ref's bottom band) ===== */
+[data-theme="spec"] .sale-bar {
+  background: var(--accent);
+  border: 2px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  box-shadow: none;
+}
+[data-theme="spec"] .sale-bar-count {
+  color: var(--on-accent);
+  opacity: 0.7;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+[data-theme="spec"] .sale-bar-total {
+  color: var(--on-accent); /* BLACK on orange */
+  font-weight: 400;
+}
+/* CTA = black chip with orange text (>=14px bold -> AA-safe on ink) */
+[data-theme="spec"] .sale-bar-cta {
+  background: var(--border-strong);
+  color: var(--accent);
+  border-radius: var(--r-sm);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+[data-theme="spec"] .sale-bar:active {
+  transform: translateY(1px) scale(0.995);
+}
+
+/* ===== 11 · PRIMARY / SECONDARY / SUCCESS BUTTONS ===== */
+[data-theme="spec"] .btn-primary {
+  background: var(--accent);
+  color: var(--on-accent); /* black on orange */
+  border: 2px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  box-shadow: none;
+}
+[data-theme="spec"] .btn-primary:active {
+  transform: translateY(1px);
+  background: var(--border-strong);
+  color: var(--accent);
+  transition: background var(--spec-flash), color var(--spec-flash);
+}
+[data-theme="spec"] .btn-secondary {
+  background: var(--surface);
+  color: var(--text);
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--r-sm);
+}
+[data-theme="spec"] .btn-secondary:active {
+  transform: translateY(1px);
+  background: var(--surface-2);
+}
+[data-theme="spec"] .btn-success {
+  background: var(--success);
+  color: #ffffff;
+  border: 2px solid var(--border-strong);
+  border-radius: var(--r-sm);
+}
+[data-theme="spec"] .btn-success:active {
+  transform: translateY(1px);
+}
+
+/* ===== 12 · SHEET — document sheet, ink top rule + orange crop brackets ===== */
+[data-theme="spec"] .sheet {
+  background: var(--bg);
+  border-top: 2px solid var(--border-strong);
+  border-radius: var(--r-md) var(--r-md) 0 0;
+}
+[data-theme="spec"] .sheet-handle {
+  background: var(--border-strong);
+  border-radius: var(--r-sm);
+}
+/* orange crop-mark brackets at the sheet's top corners */
+[data-theme="spec"] .sheet::before,
+[data-theme="spec"] .sheet::after {
+  content: "";
+  position: absolute;
+  top: 8px;
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+  z-index: 2;
+}
+[data-theme="spec"] .sheet::before {
+  left: 12px;
+  border-top: 2px solid var(--accent);
+  border-left: 2px solid var(--accent);
+}
+[data-theme="spec"] .sheet::after {
+  right: 12px;
+  border-top: 2px solid var(--accent);
+  border-right: 2px solid var(--accent);
+}
+[data-theme="spec"] .sheet-title {
+  font-weight: 700;
+}
+[data-theme="spec"] .sale-line {
+  border-bottom: 1.5px solid var(--border);
+}
+/* grand total pressed with a heavy ink rule */
+[data-theme="spec"] .summary-row.total,
+[data-theme="spec"] .receipt-total {
+  font-family: var(--font-display);
+  font-weight: 400;
+  border-top: 2px solid var(--border-strong);
+  padding-top: 8px;
+}
+
+/* payment chips -> ink-outline units, active = ink fill */
+[data-theme="spec"] .pay-chip {
+  background: var(--surface);
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  color: var(--text);
+  font-weight: 700;
+}
+[data-theme="spec"] .pay-chip.active {
+  background: var(--border-strong);
+  color: var(--surface);
+}
+
+/* mini action buttons -> small ink-outline tickets */
+[data-theme="spec"] .mini-btn {
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--text);
+}
+[data-theme="spec"] .mini-btn.active {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--border-strong);
+}
+[data-theme="spec"] .mini-btn:active {
+  transform: translateY(1px);
+}
+
+/* ===== 13 · SECTION TITLE + BADGES + TAGS (chips) ===== */
+[data-theme="spec"] .section-title {
+  color: var(--text-secondary);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+[data-theme="spec"] .section-title::after {
+  background: var(--border-strong); /* ink rule */
+  height: 1.5px;
+}
+/* generic badges / tags -> black clearance chips */
+[data-theme="spec"] .badge,
+[data-theme="spec"] .tag {
+  background: var(--border-strong);
+  color: #ffffff;
+  border-radius: var(--r-sm);
+  letter-spacing: 0.04em;
+  font-weight: 700;
+}
+[data-theme="spec"] .tag-tokuten {
+  background: var(--accent);
+  color: var(--on-accent); /* black on orange chip */
+}
+
+/* ready chip (offline status) -> spec status line */
+[data-theme="spec"] .ready-chip {
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+}
+
+/* ===== 14 · MOTION — reg crosses + codes fade in; reduced-motion gate ===== */
+@keyframes spec-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="spec"] .nav-card::after,
+  [data-theme="spec"] .nav-card::before {
+    animation: none;
+    opacity: 1;
+  }
+  [data-theme="spec"] .open-stall-btn:active,
+  [data-theme="spec"] .btn-primary:active,
+  [data-theme="spec"] .nav-card:active,
+  [data-theme="spec"] .tab:active,
+  [data-theme="spec"] .item-card:active,
+  [data-theme="spec"] .sale-bar:active,
+  [data-theme="spec"] .mini-btn:active,
+  [data-theme="spec"] .btn-secondary:active,
+  [data-theme="spec"] .btn-success:active {
+    transition: none;
+  }
+}

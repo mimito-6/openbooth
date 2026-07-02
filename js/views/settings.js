@@ -16,16 +16,24 @@
     { code: "HKD", symbol: "HK$" },
   ];
   const THEMES = [
+    { group: "theme_basic" },
     { id: "warm", dots: ["#c46b43", "#faf6f0", "#6b5b95"] },
     { id: "sakura", dots: ["#e0688a", "#fdf3f5", "#8a6bc4"] },
     { id: "ocean", dots: ["#087f8c", "#eef8f8", "#356da8"] },
     { id: "mono", dots: ["#1c1c1a", "#f5f5f4", "#6e6e69"] },
     { id: "night", dots: ["#e08a5c", "#1b1916", "#a48fd6"] },
     // design themes (taste-driven set)
+    { group: "theme_design" },
     { id: "koishi", dots: ["#b3704c", "#ece3d2", "#7d7363"] }, // warm tactile clay
     { id: "linen", dots: ["#a3564e", "#f0ece2", "#6d6385"] }, // warm editorial minimal
     { id: "graphite", dots: ["#4f9d80", "#17171a", "#7e8aa0"] }, // premium dark
     { id: "sage", dots: ["#5f7d68", "#e6e8df", "#6a7088"] }, // calm natural
+    // v2 reference-driven bold-layout themes
+    { id: "folio", dots: ["#2653e8", "#f2f4fa", "#14181f"] }, // blue/white portfolio editorial
+    { id: "halftone", dots: ["#2244d4", "#dfe2e8", "#5a5f6a"] }, // swiss silver halftone
+    { id: "zine", dots: ["#c81e56", "#f3efdf", "#2b58c8"] }, // ascii doujin zine
+    { id: "spec", dots: ["#e84e14", "#f6f5f1", "#171715"] }, // industrial spec sheet
+    { id: "pixel", dots: ["#3a4150", "#e2e5f0", "#949bb0"] }, // techwear pixel label
   ];
 
   function render(root) {
@@ -93,6 +101,10 @@
     // theme
     const themeGrid = el("div", { class: "theme-grid" });
     THEMES.forEach((th) => {
+      if (th.group) {
+        themeGrid.appendChild(el("div", { class: "theme-group-label", text: t(th.group) }));
+        return;
+      }
       const dots = el("div", { class: "theme-dots" }, th.dots.map((c) => el("span", { style: "background:" + c })));
       themeGrid.appendChild(
         el("div", { class: "theme-swatch" + (s.theme === th.id ? " active" : ""), onclick: () => { s.theme = th.id; OB.store.commit(); document.documentElement.dataset.theme = th.id; OB.router.refresh(); } }, [dots, el("div", { text: th.id })])

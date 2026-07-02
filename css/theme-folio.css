@@ -1,0 +1,420 @@
+/* ============================================================
+   OpenBooth — Theme "folio" (青白作品集 · cobalt/white editorial)
+   Vivid two-tone portfolio board: white file-folder cards with
+   tab notches, a numbered catalog motif, ink-stamp active states,
+   and generous cobalt weight. Editorial English micro-labels are
+   added ONLY via ::before/::after content (always Latin, CJK-safe).
+   All selectors scoped to [data-theme="folio"]. Zero leakage.
+   ============================================================ */
+
+/* ---- Token contract: self-contained palette + structural overrides ---- */
+[data-theme="folio"] {
+  --bg: #f2f4fa;            /* cool near-white paper */
+  --surface: #ffffff;       /* pure white panel */
+  --surface-2: #eaeefb;     /* pale cobalt wash (recess) */
+  --border: #c9d4f7;        /* cobalt-tinted hairline */
+  --border-strong: #2653e8; /* cobalt ink line */
+  --text: #14181f;          /* near-black ink — 17.8:1 on white */
+  --text-secondary: #5a6784;/* 5.7:1 on white */
+  --text-muted: #8b97b3;    /* decoration/hints only */
+  --accent: #2653e8;        /* cobalt — used generously (two-tone) */
+  --accent-dark: #1c3fc0;   /* darker cobalt for text-on-white (8.3:1) */
+  --accent-light: #e4eaff;  /* pale blue fill */
+  --on-accent: #ffffff;     /* white on cobalt — 6:1 */
+  --success: #1f8a52;
+  --success-light: #dff2e7;
+  --combo: #6a3fd0;
+  --combo-light: #ebe3fb;
+  --danger: #d33a3a;
+  --warning: #b7791f;
+  /* crisp print look — grotesk display, tight radii, flat hairline shadow */
+  --font-sans: "Space Grotesk", -apple-system, BlinkMacSystemFont, "PingFang TC",
+    "Hiragino Sans", "Noto Sans TC", "Noto Sans JP", sans-serif;
+  --font-display: "Space Grotesk", -apple-system, "PingFang TC", "Noto Sans TC", sans-serif;
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-xl: 18px;
+  --shadow-card: 0 1px 0 rgba(38, 83, 232, 0.08);
+  --shadow-float: 0 6px 20px rgba(38, 83, 232, 0.22);
+  --shadow-sheet: 0 -8px 30px rgba(38, 83, 232, 0.16);
+}
+
+/* ---- Display type: bold grotesk on headings + money surfaces ---- */
+[data-theme="folio"] .home-shop-name,
+[data-theme="folio"] .title,
+[data-theme="folio"] .stat-value,
+[data-theme="folio"] .item-price,
+[data-theme="folio"] .sale-bar-total,
+[data-theme="folio"] .summary-row.total,
+[data-theme="folio"] .receipt-total,
+[data-theme="folio"] .open-stall-btn {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.01em; /* negative only — safe on CJK */
+}
+
+/* Editorial shop name with a superscript ® flavor mark (Latin, decorative) */
+[data-theme="folio"] .home-shop-name {
+  font-size: 26px;
+  color: var(--text);
+}
+[data-theme="folio"] .home-shop-name::after {
+  content: "®";
+  font-size: 0.42em;
+  vertical-align: super;
+  color: var(--accent);
+  margin-left: 3px;
+  font-weight: 700;
+}
+[data-theme="folio"] .home-event-line {
+  color: var(--text-secondary);
+}
+
+/* ---- Header: cobalt hairline under a white sticky bar ---- */
+[data-theme="folio"] .header {
+  border-bottom: 2px solid var(--accent);
+}
+
+/* ---- Section titles -> tiny ink label + a solid cobalt rule ---- */
+[data-theme="folio"] .section-title {
+  color: var(--text);
+  font-weight: 700;
+}
+[data-theme="folio"] .section-title::after {
+  height: 2px;
+  background: var(--accent);
+  opacity: 0.85;
+}
+
+/* smooth press feel on everything tappable (transform/shadow only) */
+[data-theme="folio"] .nav-card,
+[data-theme="folio"] .item-card,
+[data-theme="folio"] .tab,
+[data-theme="folio"] .btn,
+[data-theme="folio"] .open-stall-btn,
+[data-theme="folio"] .sale-bar {
+  transition: transform 0.12s ease, box-shadow 0.18s ease, background 0.15s ease,
+    color 0.15s ease, border-color 0.15s ease;
+}
+
+/* ============================================================
+   HOME nav grid — white FOLDER CARDS, auto-numbered catalog 01–06
+   Grid stays 3-up; each card is a folder with a top-left tab and a
+   corner index number. :active stamps the card solid cobalt (ink).
+   ============================================================ */
+[data-theme="folio"] .nav-grid {
+  counter-reset: folio-nav; /* start the catalog counter */
+  gap: 12px;
+}
+[data-theme="folio"] .nav-card {
+  counter-increment: folio-nav;
+  position: relative;           /* for folder tab + index */
+  overflow: visible;            /* let the tab stick up */
+  margin-top: 9px;              /* room for the protruding tab */
+  background: var(--surface);
+  border: 2px solid var(--accent);
+  border-radius: 3px var(--r-md) var(--r-md) var(--r-md); /* asymmetric folder corner */
+  box-shadow: var(--shadow-card);
+  padding: 20px 10px 16px;
+}
+/* folder TAB notch sticking up from the top-left edge */
+[data-theme="folio"] .nav-card::before {
+  content: "";
+  position: absolute;
+  top: -9px;
+  left: 12px;
+  width: 40px;
+  height: 11px;
+  background: var(--surface);
+  border: 2px solid var(--accent);
+  border-bottom: none;
+  border-radius: 5px 5px 0 0;
+}
+/* tiny cobalt index number "01"–"06" in the top-right corner (Latin, safe) */
+[data-theme="folio"] .nav-card::after {
+  content: "N°" counter(folio-nav, decimal-leading-zero);
+  position: absolute;
+  top: 7px;
+  right: 9px;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em; /* Latin-only pseudo content — safe */
+  color: var(--accent);
+  opacity: 0.85;
+}
+/* icon in cobalt (base already sets accent; restate for clarity) */
+[data-theme="folio"] .nav-card .nav-emoji.nav-ico {
+  color: var(--accent);
+}
+[data-theme="folio"] .nav-card .nav-name {
+  color: var(--text);
+  font-weight: 700;
+}
+/* :active = solid cobalt fill, white text/icon — like an ink stamp */
+[data-theme="folio"] .nav-card:active {
+  transform: scale(0.96);
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: none;
+}
+[data-theme="folio"] .nav-card:active::before {
+  background: var(--accent);
+}
+[data-theme="folio"] .nav-card:active::after {
+  color: var(--on-accent);
+  opacity: 0.9;
+}
+[data-theme="folio"] .nav-card:active .nav-emoji.nav-ico,
+[data-theme="folio"] .nav-card:active .nav-name {
+  color: var(--on-accent);
+}
+
+/* quick staggered fade-up on load (gated for reduced-motion) */
+[data-theme="folio"] .view.active .nav-card {
+  animation: folio-rise 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+[data-theme="folio"] .nav-card:nth-child(2) { animation-delay: 0.05s; }
+[data-theme="folio"] .nav-card:nth-child(3) { animation-delay: 0.1s; }
+[data-theme="folio"] .nav-card:nth-child(4) { animation-delay: 0.15s; }
+[data-theme="folio"] .nav-card:nth-child(5) { animation-delay: 0.2s; }
+[data-theme="folio"] .nav-card:nth-child(6) { animation-delay: 0.25s; }
+@keyframes folio-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="folio"] .view.active .nav-card { animation: none; }
+}
+
+/* ---- Hero button — the solid-cobalt printed bar ---- */
+[data-theme="folio"] .open-stall-btn {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-radius: var(--r-lg);
+  box-shadow: 0 4px 0 var(--accent-dark); /* darker bottom edge — feels printed */
+  font-weight: 700;
+  letter-spacing: 0.01em; /* label may contain CJK — keep tight */
+}
+[data-theme="folio"] .open-stall-btn:active {
+  transform: translateY(1px);
+  background: var(--accent-dark);
+  box-shadow: 0 2px 0 var(--accent-dark);
+}
+
+/* ---- Stat chips — outlined white with cobalt hairline + N° meta ---- */
+[data-theme="folio"] .stat {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
+  box-shadow: none;
+  position: relative;
+}
+[data-theme="folio"] .stat-label {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+[data-theme="folio"] .stat-value {
+  color: var(--text);
+}
+
+/* ---- Category tabs — outlined pills; active = solid cobalt ---- */
+[data-theme="folio"] .tab {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+[data-theme="folio"] .tab.active {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent);
+}
+[data-theme="folio"] .tab:active {
+  transform: scale(0.96);
+}
+
+/* ============================================================
+   Product tiles — white cards, cobalt-tinted hairline; selected
+   tiles fill pale blue with a solid cobalt border (catalog "picked").
+   ============================================================ */
+[data-theme="folio"] .item-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-card);
+}
+[data-theme="folio"] .item-card:active {
+  transform: scale(0.97);
+  background: var(--accent-light);
+  border-color: var(--accent);
+}
+[data-theme="folio"] .item-card.has-qty {
+  background: var(--accent-light);
+  border-color: var(--accent);
+  border-width: 2px;
+}
+[data-theme="folio"] .item-price {
+  color: var(--text);
+  font-weight: 700;
+}
+/* price on the pale-blue selected fill -> cobalt ink (accent-dark, 6.9:1) */
+[data-theme="folio"] .item-card.has-qty .item-price {
+  color: var(--accent-dark);
+}
+[data-theme="folio"] .item-bundle {
+  color: var(--accent-dark);
+  font-weight: 700;
+}
+[data-theme="folio"] .qty-badge {
+  background: var(--accent);
+  box-shadow: 0 0 0 2px var(--surface);
+}
+
+/* ---- Sale bar — solid cobalt shelf, white total + outlined CTA ---- */
+[data-theme="folio"] .sale-bar {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-float);
+}
+[data-theme="folio"] .sale-bar-total {
+  color: var(--on-accent);
+  font-weight: 700;
+}
+[data-theme="folio"] .sale-bar-count {
+  color: var(--on-accent);
+  opacity: 0.75;
+}
+/* white outlined "printed" CTA button on the cobalt bar */
+[data-theme="folio"] .sale-bar-cta {
+  background: var(--surface);
+  color: var(--accent-dark);
+  border: 1.5px solid var(--surface);
+  font-weight: 700;
+}
+[data-theme="folio"] .sale-bar:active {
+  transform: scale(0.98);
+}
+
+/* ---- Primary / secondary buttons — printed cobalt + outlined ---- */
+[data-theme="folio"] .btn-primary {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-radius: var(--r-md);
+  box-shadow: 0 3px 0 var(--accent-dark);
+}
+[data-theme="folio"] .btn-primary:active {
+  transform: translateY(1px);
+  background: var(--accent-dark);
+  box-shadow: 0 1px 0 var(--accent-dark);
+}
+[data-theme="folio"] .btn-secondary {
+  background: var(--surface);
+  color: var(--accent-dark);
+  border: 1.5px solid var(--accent);
+  border-radius: var(--r-md);
+}
+[data-theme="folio"] .btn-success {
+  border-radius: var(--r-md);
+}
+
+/* ---- Payment chips — outlined, cobalt when active ---- */
+[data-theme="folio"] .pay-chip {
+  background: var(--surface);
+  border: 2px solid var(--border);
+}
+[data-theme="folio"] .pay-chip.active {
+  border-color: var(--accent);
+  background: var(--accent-light);
+  color: var(--accent-dark);
+}
+
+/* ============================================================
+   List rows (records / stock / preorders) — numbered CATALOG motif.
+   A cobalt index number leads each row; cobalt hairline dividers.
+   Counter is scoped to each list container that holds .list-row.
+   ============================================================ */
+[data-theme="folio"] .settings-list,
+[data-theme="folio"] .sheet-body,
+[data-theme="folio"] main {
+  counter-reset: folio-row;
+}
+[data-theme="folio"] .list-row {
+  counter-increment: folio-row;
+  border-bottom: 1.5px solid var(--border);
+  position: relative;
+}
+[data-theme="folio"] .list-row .list-main::before {
+  content: counter(folio-row, decimal-leading-zero);
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em; /* Latin digits only — safe */
+  color: var(--accent);
+  margin-right: 8px;
+  opacity: 0.7;
+}
+[data-theme="folio"] .list-amount {
+  color: var(--text);
+  font-weight: 800;
+}
+
+/* settings rows keep the hairline catalog dividers */
+[data-theme="folio"] .settings-item {
+  border-bottom: 1.5px solid var(--border);
+}
+
+/* ---- Search box — outlined cobalt hairline, focus goes cobalt ---- */
+[data-theme="folio"] .search-box input {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+}
+[data-theme="folio"] .search-box input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* ---- Sheet / summary — white paper, cobalt total ---- */
+[data-theme="folio"] .sheet {
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+}
+[data-theme="folio"] .sheet-handle {
+  background: var(--accent);
+  opacity: 0.4;
+}
+[data-theme="folio"] .summary-row.total {
+  color: var(--text);
+  border-top: 2px solid var(--accent);
+}
+[data-theme="folio"] .receipt-thanks {
+  color: var(--accent);
+}
+
+/* ---- Badges / tags — crisp cobalt chips ---- */
+[data-theme="folio"] .badge.notified {
+  background: var(--accent-light);
+  color: var(--accent-dark);
+}
+[data-theme="folio"] .event-chip {
+  border: 1.5px solid var(--border);
+}
+
+/* ============================================================
+   Signature backdrop — faint cobalt registration-grid (blueprint).
+   Fixed, pointer-events:none, decorative. Reduced-motion untouched
+   (it is static), but kept subtle so body text stays AA.
+   ============================================================ */
+[data-theme="folio"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5;
+  background-image:
+    linear-gradient(to right, rgba(38, 83, 232, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(38, 83, 232, 0.045) 1px, transparent 1px);
+  background-size: 26px 26px;
+}

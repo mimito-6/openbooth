@@ -1,0 +1,470 @@
+/* ============================================================
+   OpenBooth — Theme "zine" (ASCII doujin party flyer)
+   Warm cream paper, a royal-blue ASCII texture mural under
+   everything, crimson-magenta condensed display type, mono
+   typewriter energy, misregistered-print offset shadows and
+   rotated sticker panels. Hand-assembled fan-zine, not a template.
+
+   Every selector is prefixed [data-theme="zine"] — nothing leaks.
+   CJK safety: no uppercase / wide tracking on any text node that
+   can carry CJK (names, titles, labels). All decorative ASCII /
+   English chrome lives in ::before / ::after content only.
+   ============================================================ */
+
+/* ---------- 0 · Fonts (declared here; latin-only, CJK falls back) ---------- */
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/ibm-plex-mono-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+2000-206F, U+20AC,
+    U+2122, U+2212, U+FEFF;
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-weight: 600;
+  font-display: swap;
+  src: url("../fonts/ibm-plex-mono-600-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+2000-206F, U+20AC,
+    U+2122, U+2212, U+FEFF;
+}
+
+/* ---------- 1 · Token block (all 18 colors + structural overrides) ---------- */
+[data-theme="zine"] {
+  --bg: #f3efdf; /* warm cream paper */
+  --surface: #faf7ea; /* whiter sticker stock */
+  --surface-2: #ece6ce; /* recessed cream */
+  --border: #24242a; /* ink hairline (shape from ink, not tint) */
+  --border-strong: #24242a; /* heavy ink */
+  --text: #24242a; /* deep ink — 12.4:1 on cream */
+  --text-secondary: #4c4c56; /* 8.0:1 */
+  --text-muted: #6f6f79; /* 4.6:1 — hints only */
+  --accent: #c81e56; /* crimson-magenta — 5.6:1 on cream (large + chrome) */
+  --accent-dark: #a41345; /* 7.6:1 — safe for small text / values */
+  --accent-light: #fbe4ec; /* pale pink fill */
+  --on-accent: #fff6f0; /* warm white on magenta */
+  --success: #1f7a46;
+  --success-light: #dff0e4;
+  --combo: #2b58c8; /* royal ASCII blue — the second voice */
+  --combo-light: #e2e8fa;
+  --danger: #c0271b;
+  --warning: #9a6b0f;
+
+  /* mono everywhere — authentic zine (mono + system CJK is intended) */
+  --font-sans: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo,
+    "PingFang TC", "Hiragino Sans", "Noto Sans TC", "Noto Sans JP", monospace;
+  --font-display: "IBM Plex Mono", ui-monospace, Menlo, "PingFang TC",
+    "Noto Sans TC", monospace;
+
+  /* small radii, flat cut-paper look */
+  --r-sm: 4px;
+  --r-md: 5px;
+  --r-lg: 6px;
+  --r-xl: 8px;
+
+  /* misregistered-print: hard blue offset instead of soft blur */
+  --shadow-card: 3px 3px 0 var(--combo);
+  --shadow-float: 4px 4px 0 var(--combo);
+  --shadow-sheet: 0 -4px 0 var(--border-strong);
+}
+
+/* ---------- 2 · Mono chrome + money in 600 (numeric / latin surfaces) ---------- */
+[data-theme="zine"] .stat-value,
+[data-theme="zine"] .item-price,
+[data-theme="zine"] .sale-bar-total,
+[data-theme="zine"] .sale-bar-count,
+[data-theme="zine"] .sale-line-total,
+[data-theme="zine"] .summary-row.total,
+[data-theme="zine"] .receipt-total,
+[data-theme="zine"] .cash-confirm .val,
+[data-theme="zine"] input[inputmode="numeric"],
+[data-theme="zine"] .qty-badge,
+[data-theme="zine"] .qty-num {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1, "zero" 1;
+}
+/* money reads in the magenta-dark (AA-safe at small sizes) */
+[data-theme="zine"] .stat-value,
+[data-theme="zine"] .item-price,
+[data-theme="zine"] .sale-line-total {
+  color: var(--accent-dark);
+}
+
+/* ---------- 3 · Body: fixed ASCII texture mural (THE signature) ---------- */
+/* A tiled data-URI of blue monospace character rows — subtle enough to keep
+   text legible, present enough to feel like the printed flyer paper. */
+[data-theme="zine"] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.06;
+  background-repeat: repeat;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='120'%3E%3Cstyle%3Etext%7Bfont-family:monospace;font-size:15px;fill:%232b58c8;letter-spacing:1px%7D%3C/style%3E%3Ctext x='0' y='16'%3E@@MJZ0Jr//@@MJ0Zr%2F%2F@@M%3C/text%3E%3Ctext x='0' y='36'%3EZ0r%2F%2F@@MMJZ0r%2F@@MJZ00J%3C/text%3E%3Ctext x='0' y='56'%3E%2F%2F@@MJZ0Jr%2F%2F@@MMJZ0r%2F%2F%3C/text%3E%3Ctext x='0' y='76'%3EMJ0Zr%2F@@MJZ0Jr%2F%2F@@MJ0Z%3C/text%3E%3Ctext x='0' y='96'%3E0Jr%2F%2F@@MMJZ0r%2F%2F@@MJZ0r%3C/text%3E%3Ctext x='0' y='116'%3E@@MJZ0Jr%2F%2F@@MJ0Zr%2F@@M%3C/text%3E%3C/svg%3E");
+}
+/* keep real content above the mural */
+[data-theme="zine"] .view,
+[data-theme="zine"] .header,
+[data-theme="zine"] .sale-bar,
+[data-theme="zine"] .sheet {
+  position: relative;
+  z-index: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="zine"] body::after {
+    opacity: 0.045;
+  }
+}
+
+/* ---------- 4 · HOME hero + shop name ---------- */
+[data-theme="zine"] .home-shop-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.01em; /* tight, NOT wide — CJK-safe */
+}
+[data-theme="zine"] .home-event-line {
+  color: var(--text-secondary);
+}
+/* offline-ready chip -> ink-dashed sticker */
+[data-theme="zine"] .ready-chip {
+  border: 1.5px dashed var(--border-strong);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+}
+
+/* ---------- 5 · Stats: mono readouts, dashed zine cut-lines ---------- */
+[data-theme="zine"] .stat {
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  box-shadow: none;
+  background: var(--surface);
+  position: relative;
+}
+/* dashed rule between stat cells — the "cut here" line */
+[data-theme="zine"] .stat + .stat {
+  border-left: 1.5px dashed var(--border-strong);
+}
+[data-theme="zine"] .stat-label {
+  color: var(--text-secondary);
+  letter-spacing: 0.02em; /* labels may carry CJK — keep tracking gentle */
+}
+
+/* ---------- 6 · Section title: decorative "///" prefix ---------- */
+[data-theme="zine"] .section-title {
+  color: var(--combo);
+  letter-spacing: 0.02em;
+}
+[data-theme="zine"] .section-title::before {
+  content: "///";
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.05em; /* ASCII-only pseudo content — safe to track */
+}
+[data-theme="zine"] .section-title::after {
+  background: repeating-linear-gradient(
+    90deg,
+    var(--border-strong) 0 5px,
+    transparent 5px 10px
+  );
+  height: 1.5px;
+}
+
+/* ---------- 7 · HOME nav tiles: white sticker panels, offset print ---------- */
+[data-theme="zine"] .nav-card {
+  background: var(--surface);
+  border: 2px solid var(--border-strong);
+  border-radius: var(--r-md);
+  box-shadow: 3px 3px 0 var(--combo); /* misregistered second border */
+  transition: transform 0.12s ease, box-shadow 0.12s ease,
+    border-color 0.12s ease, background 0.12s ease;
+  position: relative;
+}
+/* tiny sticker markers — decorative ASCII only, never CJK */
+[data-theme="zine"] .nav-card::before {
+  content: "▶";
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  font-family: var(--font-display);
+  font-size: 9px;
+  color: var(--combo);
+}
+[data-theme="zine"] .nav-card::after {
+  content: "*";
+  position: absolute;
+  top: 5px;
+  right: 9px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  color: var(--accent);
+}
+/* alternating pasted-on tilt (decorative, subtle, never reading-critical) */
+[data-theme="zine"] .nav-card:nth-child(odd) {
+  transform: rotate(-0.6deg);
+}
+[data-theme="zine"] .nav-card:nth-child(even) {
+  transform: rotate(0.5deg);
+}
+/* stamp-down on press: rotate flat + shove onto the offset shadow */
+[data-theme="zine"] .nav-card:active {
+  transform: rotate(0deg) translate(3px, 3px) scale(0.97);
+  box-shadow: 0 0 0 var(--combo);
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+/* icon glyphs: blue by default, magenta on press */
+[data-theme="zine"] .nav-card .nav-emoji.nav-ico {
+  color: var(--combo);
+}
+[data-theme="zine"] .nav-card:active .nav-emoji.nav-ico {
+  color: var(--accent);
+}
+[data-theme="zine"] .nav-card .nav-name {
+  font-family: var(--font-display);
+  color: var(--text);
+  letter-spacing: 0; /* CJK-bearing — no tracking */
+}
+/* nav badge -> magenta stamp */
+[data-theme="zine"] .nav-card .nav-badge {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-radius: var(--r-sm);
+}
+
+/* load-in: quick staggered paste-down (reduced-motion gated) */
+[data-theme="zine"] .view.active .nav-card {
+  animation: zine-paste 0.3s ease both;
+}
+[data-theme="zine"] .nav-card:nth-child(2) { animation-delay: 0.03s; }
+[data-theme="zine"] .nav-card:nth-child(3) { animation-delay: 0.06s; }
+[data-theme="zine"] .nav-card:nth-child(4) { animation-delay: 0.09s; }
+[data-theme="zine"] .nav-card:nth-child(5) { animation-delay: 0.12s; }
+[data-theme="zine"] .nav-card:nth-child(6) { animation-delay: 0.15s; }
+@keyframes zine-paste {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="zine"] .view.active .nav-card {
+    animation: none;
+  }
+  /* drop the decorative tilt so nothing moves for motion-sensitive users */
+  [data-theme="zine"] .nav-card:nth-child(odd),
+  [data-theme="zine"] .nav-card:nth-child(even) {
+    transform: none;
+  }
+}
+
+/* ---------- 8 · open-stall hero: magenta block, hard blue offset ---------- */
+[data-theme="zine"] .open-stall-btn {
+  background: var(--accent);
+  color: var(--on-accent);
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.01em; /* label may be CJK ("開攤") — keep tight */
+  border: 2px solid var(--border-strong);
+  border-radius: var(--r-md);
+  box-shadow: 4px 4px 0 var(--combo);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+[data-theme="zine"] .open-stall-btn:active {
+  transform: translate(4px, 4px); /* collapse onto the shadow */
+  box-shadow: 0 0 0 var(--combo);
+}
+
+/* ---------- 9 · Category tabs: dashed chips / magenta fill when active ---------- */
+[data-theme="zine"] .tab {
+  background: var(--surface);
+  color: var(--text);
+  border: 1.5px dashed var(--border-strong);
+  border-radius: var(--r-sm);
+  font-family: var(--font-display);
+  transition: transform 0.1s ease, background 0.12s ease, color 0.12s ease;
+}
+[data-theme="zine"] .tab.active {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-style: solid;
+  border-color: var(--accent);
+}
+[data-theme="zine"] .tab:active {
+  transform: translateY(1px);
+}
+
+/* ---------- 10 · Product tiles: sticker cards, blue offset ---------- */
+[data-theme="zine"] .item-card {
+  background: var(--surface);
+  border: 2px solid var(--border-strong);
+  border-radius: var(--r-md);
+  box-shadow: 3px 3px 0 var(--combo);
+  transition: transform 0.1s ease, box-shadow 0.1s ease,
+    border-color 0.12s ease, background 0.12s ease;
+}
+[data-theme="zine"] .item-card:active {
+  transform: translate(3px, 3px) scale(0.97); /* paste-down */
+  box-shadow: 0 0 0 var(--combo);
+}
+[data-theme="zine"] .item-card.has-qty {
+  background: var(--accent-light);
+  border-color: var(--accent);
+  box-shadow: 3px 3px 0 var(--accent);
+}
+[data-theme="zine"] .item-card.has-qty .item-price {
+  color: var(--accent-dark);
+}
+[data-theme="zine"] .item-name {
+  letter-spacing: 0; /* product names carry CJK — no tracking */
+}
+/* qty badge -> magenta stamp */
+[data-theme="zine"] .qty-badge {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-radius: var(--r-sm);
+  border: 1.5px solid var(--border-strong);
+}
+/* combo letter chip -> blue ink stamp */
+[data-theme="zine"] .item-card .combo-letter {
+  background: var(--combo);
+  color: var(--on-accent);
+  border-radius: 3px;
+}
+
+/* ---------- 11 · Sale bar: cream tear-line strip + magenta CTA ---------- */
+[data-theme="zine"] .sale-bar {
+  background: var(--bg);
+  border-top: 2px dashed var(--border-strong); /* tear line */
+  box-shadow: none;
+}
+[data-theme="zine"] .sale-bar-total {
+  color: var(--accent-dark);
+  letter-spacing: -0.01em;
+}
+[data-theme="zine"] .sale-bar-count {
+  color: var(--text-secondary);
+}
+[data-theme="zine"] .sale-bar-cta {
+  background: var(--accent);
+  color: var(--on-accent);
+  border: 2px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  font-family: var(--font-display);
+  font-weight: 600;
+  box-shadow: 3px 3px 0 var(--combo);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+[data-theme="zine"] .sale-bar:active .sale-bar-cta {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 var(--combo);
+}
+
+/* ---------- 12 · Buttons: ink border + hard blue offset ---------- */
+[data-theme="zine"] .btn-primary {
+  background: var(--accent);
+  color: var(--on-accent);
+  border: 2px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  box-shadow: 3px 3px 0 var(--combo);
+  font-family: var(--font-display);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+[data-theme="zine"] .btn-primary:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 var(--combo);
+}
+[data-theme="zine"] .btn-success {
+  background: var(--success);
+  color: var(--on-accent);
+  border: 2px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  box-shadow: 3px 3px 0 var(--border-strong);
+}
+[data-theme="zine"] .btn-success:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 var(--border-strong);
+}
+[data-theme="zine"] .btn-primary,
+[data-theme="zine"] .btn-success {
+  font-weight: 600;
+}
+[data-theme="zine"] .btn-secondary {
+  background: var(--surface);
+  color: var(--text);
+  border: 1.5px dashed var(--border-strong);
+  border-radius: var(--r-sm);
+}
+[data-theme="zine"] .btn-secondary:active {
+  transform: translateY(1px);
+}
+/* pay chips + mini buttons */
+[data-theme="zine"] .pay-chip {
+  border: 1.5px dashed var(--border-strong);
+  border-radius: var(--r-sm);
+}
+[data-theme="zine"] .pay-chip.active {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-style: solid;
+  border-color: var(--accent);
+}
+[data-theme="zine"] .mini-btn {
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--r-sm);
+}
+[data-theme="zine"] .mini-btn.active {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent);
+}
+
+/* ---------- 13 · Cart sheet / receipt: paper-tape with dashed rules ---------- */
+[data-theme="zine"] .sheet {
+  border: 2px solid var(--border-strong);
+  border-bottom: none;
+}
+[data-theme="zine"] .sale-line {
+  border-bottom: 1.5px dashed var(--border-strong);
+}
+[data-theme="zine"] .summary-row.total,
+[data-theme="zine"] .receipt-total {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--accent-dark);
+  border-top: 2px dashed var(--border-strong);
+  padding-top: 8px;
+}
+[data-theme="zine"] .qty-controls .qty-btn {
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--r-sm);
+}
+[data-theme="zine"] .qty-controls .qty-btn:active {
+  transform: translateY(1px);
+  background: var(--accent-light);
+}
+
+/* inputs: ink hairline, mono */
+[data-theme="zine"] input,
+[data-theme="zine"] select,
+[data-theme="zine"] textarea,
+[data-theme="zine"] .search-box input {
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  font-family: var(--font-sans);
+}
+[data-theme="zine"] input:focus,
+[data-theme="zine"] textarea:focus,
+[data-theme="zine"] select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 2px 2px 0 var(--accent);
+}
+
+/* ---------- 14 · Badges: rubber-stamp squares ---------- */
+[data-theme="zine"] .badge,
+[data-theme="zine"] .nav-badge {
+  border-radius: var(--r-sm);
+  letter-spacing: 0.02em;
+}

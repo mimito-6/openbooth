@@ -1,0 +1,450 @@
+/* ============================================================
+   OpenBooth — Theme "halftone" (Swiss silver poster)
+   Silver metallic paper + all-over halftone dot texture, very
+   large light-weight grey display type, cobalt blue RESERVED for
+   key data (money / dates / CTA). Rounded speech-bubble pills hold
+   the numerals; hairline rules; three tiny nav-dots. Institutional-
+   futurist, cool, precise, quiet.
+   All selectors scoped to [data-theme="halftone"].
+   ============================================================ */
+
+/* ---------------------------------------------------------------
+   1. TOKENS — self-contained (all 18 colours + structural overrides)
+   AA/AAA verified on silver: text 12.9:1, text-secondary 6.0:1,
+   accent 6.8:1 (on surface), on-accent 6.5:1 (on cobalt). Muted
+   grey is decoration-only; --text keeps ≥7:1 headroom everywhere.
+   --------------------------------------------------------------- */
+[data-theme="halftone"] {
+  --bg: #dfe2e8;            /* solid fallback; body paints the gradient */
+  --surface: #eef0f4;       /* raised silver paper */
+  --surface-2: #d3d6dd;     /* recessed / pressed */
+  --border: #c5c9d1;        /* hairline */
+  --border-strong: #9aa0aa; /* stronger rule */
+  --text: #23262c;          /* cool ink */
+  --text-secondary: #5a5f6a;/* legible grey (AA) */
+  --text-muted: #868c96;    /* AA-large / decoration only */
+  --accent: #2244d4;        /* cobalt — money / dates / CTA ONLY */
+  --accent-dark: #182f9e;
+  --accent-light: #dde3f8;
+  --on-accent: #f2f4ff;
+  --success: #227a4b;
+  --success-light: #dcecdf;
+  --combo: #4b41a8;
+  --combo-light: #e2e0f4;
+  --danger: #c02a2a;
+  --warning: #8a5a0e;
+  /* structural: very round pills, near-flat hairline shadows */
+  --font-sans: "Space Grotesk", -apple-system, BlinkMacSystemFont, "PingFang TC",
+    "Hiragino Sans", "Noto Sans TC", "Noto Sans JP", sans-serif;
+  --font-display: "Space Grotesk", -apple-system, "PingFang TC", "Noto Sans TC", sans-serif;
+  --r-sm: 12px;
+  --r-md: 16px;
+  --r-lg: 20px;
+  --r-xl: 24px;
+  --shadow-card: 0 1px 2px rgba(35, 38, 44, 0.08);
+  --shadow-float: 0 2px 6px rgba(35, 38, 44, 0.16);
+  --shadow-sheet: 0 -2px 10px rgba(35, 38, 44, 0.12);
+  /* reusable dot-matrix layer (regular grid, dark dots) */
+  --ht-dot: radial-gradient(circle, rgba(35, 38, 44, 0.10) 1px, transparent 1.3px);
+}
+
+/* ---------------------------------------------------------------
+   2. TYPE — light-weight grey display, cobalt only on money
+   CJK SAFETY: no uppercase / wide tracking on CJK-bearing runs.
+   --------------------------------------------------------------- */
+[data-theme="halftone"] .home-shop-name,
+[data-theme="halftone"] .title,
+[data-theme="halftone"] .section-title,
+[data-theme="halftone"] .stat-value,
+[data-theme="halftone"] .sale-bar-total,
+[data-theme="halftone"] .open-stall-btn {
+  font-family: var(--font-display);
+}
+/* big, airy, light poster headline */
+[data-theme="halftone"] .home-shop-name {
+  font-weight: 300;
+  font-size: 27px;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  color: var(--text);
+}
+[data-theme="halftone"] .home-event-line {
+  letter-spacing: 0.01em;
+  color: var(--text-secondary);
+}
+/* prices in ink; only money totals go cobalt (sale-bar / stat) */
+[data-theme="halftone"] .item-price,
+[data-theme="halftone"] .summary-row.total span:last-child,
+[data-theme="halftone"] .receipt-total {
+  font-variant-numeric: tabular-nums lining-nums;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* ---------------------------------------------------------------
+   3. BODY — silver sheen gradient + fixed halftone dot layer,
+   density fading top→bottom via mask. Static, pointer-events:none.
+   --------------------------------------------------------------- */
+[data-theme="halftone"] body {
+  background:
+    linear-gradient(180deg, #eceef2 0%, #dfe2e8 45%, #c7cad2 100%) fixed;
+}
+[data-theme="halftone"] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.6;
+  background-image: var(--ht-dot);
+  background-size: 7px 7px;
+  -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.25) 60%, transparent 100%);
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.25) 60%, transparent 100%);
+}
+
+/* motion timing — transform/opacity only */
+[data-theme="halftone"] .nav-card,
+[data-theme="halftone"] .item-card,
+[data-theme="halftone"] .tab,
+[data-theme="halftone"] .stat,
+[data-theme="halftone"] .btn,
+[data-theme="halftone"] .open-stall-btn,
+[data-theme="halftone"] .sale-bar,
+[data-theme="halftone"] .sale-bar-cta {
+  transition: transform 0.16s cubic-bezier(0.2, 0.7, 0.3, 1),
+    box-shadow 0.16s ease, background 0.16s ease, opacity 0.16s ease;
+}
+
+/* ---------------------------------------------------------------
+   4. HOME nav tiles — soft grey PILL-CARDS, ink icon, circled "›".
+   --------------------------------------------------------------- */
+[data-theme="halftone"] .nav-grid {
+  gap: 14px;
+}
+[data-theme="halftone"] .nav-card {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  background: linear-gradient(160deg, #f1f3f6, #dfe2e8);
+  box-shadow: var(--shadow-card);
+  padding: 20px 12px 22px;
+  overflow: hidden;
+}
+/* pressed: darker + halftone texture "prints" through */
+[data-theme="halftone"] .nav-card:active {
+  transform: scale(0.97);
+  background: var(--surface-2);
+  border-color: var(--border-strong);
+  box-shadow: inset 0 1px 3px rgba(35, 38, 44, 0.18);
+}
+[data-theme="halftone"] .nav-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: var(--ht-dot);
+  background-size: 7px 7px;
+  opacity: 0;
+  transition: opacity 0.16s ease;
+}
+[data-theme="halftone"] .nav-card:active::before {
+  opacity: 0.5;
+}
+/* icon glyph in ink, seated in a hairline silver disc */
+[data-theme="halftone"] .nav-card .nav-emoji.nav-ico {
+  color: var(--text);
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+[data-theme="halftone"] .nav-card .nav-emoji.nav-ico .ob-ico {
+  width: 25px;
+  height: 25px;
+}
+[data-theme="halftone"] .nav-card .nav-name {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--text);
+}
+/* signature: circled-arrow "›" bottom-right */
+[data-theme="halftone"] .nav-card::after {
+  content: "\203A"; /* › — decorative glyph, not text run */
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 14px;
+  text-align: center;
+  font-weight: 400;
+}
+
+/* ---------------------------------------------------------------
+   5. STATS — "date pill" motif: rounded pills, COBALT numerals.
+   --------------------------------------------------------------- */
+[data-theme="halftone"] .stat {
+  background: linear-gradient(160deg, #f1f3f6, #e2e5ea);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  box-shadow: var(--shadow-card);
+  padding: 12px 16px;
+  text-align: left;
+}
+[data-theme="halftone"] .stat-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  letter-spacing: 0.04em;
+}
+[data-theme="halftone"] .stat-value {
+  font-weight: 300;         /* light + big, poster style */
+  font-size: 23px;
+  letter-spacing: -0.01em;
+  color: var(--accent);     /* cobalt — the signature */
+  font-variant-numeric: tabular-nums lining-nums;
+}
+[data-theme="halftone"] .stat-value.small {
+  font-size: 19px;
+  font-weight: 300;
+}
+[data-theme="halftone"] .stat-value .unit {
+  color: var(--text-secondary);
+}
+/* on-load staggered fade for the pills (reduced-motion gated) */
+[data-theme="halftone"] .view.active .stat { animation: ht-pill-in 0.4s ease both; }
+[data-theme="halftone"] .view.active .stat:nth-child(2) { animation-delay: 0.08s; }
+[data-theme="halftone"] .view.active .stat:nth-child(3) { animation-delay: 0.16s; }
+@keyframes ht-pill-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------------------------------------------------------------
+   6. OPEN-STALL hero — large cobalt pill, generous, sinks on press
+   --------------------------------------------------------------- */
+[data-theme="halftone"] .open-stall-btn {
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 500;
+  font-size: 19px;
+  letter-spacing: 0.01em;
+  padding: 22px;
+  box-shadow: 0 2px 8px rgba(24, 47, 158, 0.28);
+}
+[data-theme="halftone"] .open-stall-btn:active {
+  transform: translateY(1px) scale(0.99);
+  background: var(--accent-dark); box-shadow: inset 0 2px 6px rgba(10, 25, 90, 0.4);
+}
+
+/* ---------------------------------------------------------------
+   7. TABS — hairline pills; active = INK-filled (blue stays for data)
+   --------------------------------------------------------------- */
+[data-theme="halftone"] .tab {
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--text-secondary);
+  box-shadow: var(--shadow-card);
+}
+[data-theme="halftone"] .tab.active {
+  background: var(--text);
+  color: var(--bg);
+  border-color: var(--text);
+}
+[data-theme="halftone"] .tab:active {
+  transform: scale(0.96);
+}
+
+/* ---------------------------------------------------------------
+   8. ITEM CARDS — flat silver, hairline, ink price
+   has-qty = pale-blue fill + cobalt hairline + cobalt price
+   --------------------------------------------------------------- */
+[data-theme="halftone"] .item-card {
+  background: linear-gradient(165deg, #f1f3f6, #e4e7ec);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  position: relative;
+}
+[data-theme="halftone"] .item-card:active {
+  transform: scale(0.97);
+  background: var(--surface-2);
+  border-color: var(--border-strong);
+  box-shadow: inset 0 1px 3px rgba(35, 38, 44, 0.16);
+}
+/* press "print" pulse */
+[data-theme="halftone"] .item-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: var(--ht-dot);
+  background-size: 7px 7px;
+  opacity: 0;
+  transition: opacity 0.16s ease;
+}
+[data-theme="halftone"] .item-card:active::before {
+  opacity: 0.5;
+}
+[data-theme="halftone"] .item-card.has-qty {
+  background: var(--accent-light);
+  border-color: var(--accent);
+}
+[data-theme="halftone"] .item-card.has-qty .item-price {
+  color: var(--accent);
+}
+[data-theme="halftone"] .item-name {
+  font-weight: 500;
+  color: var(--text);
+}
+[data-theme="halftone"] .item-bundle {
+  color: var(--accent);
+}
+/* combo variant keeps its own family colour */
+[data-theme="halftone"] .item-card.combo.has-qty {
+  background: var(--combo-light);
+  border-color: var(--combo);
+}
+[data-theme="halftone"] .item-card.combo.has-qty .item-price {
+  color: var(--combo);
+}
+
+/* ---------------------------------------------------------------
+   9. SALE BAR — silver panel, top hairline, COBALT total, cobalt CTA.
+   --------------------------------------------------------------- */
+[data-theme="halftone"] .sale-bar {
+  background: linear-gradient(180deg, #eef0f4, #d8dbe1);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-top: 1px solid var(--border-strong);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-float);
+}
+[data-theme="halftone"] .sale-bar-count {
+  color: var(--text-secondary);
+  opacity: 1;
+}
+[data-theme="halftone"] .sale-bar-total {
+  font-weight: 300;         /* light + large, poster money */
+  font-size: 24px;
+  color: var(--accent);     /* cobalt */
+  font-variant-numeric: tabular-nums lining-nums;
+}
+[data-theme="halftone"] .sale-bar-cta {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-radius: var(--r-pill);
+  font-weight: 500;
+}
+[data-theme="halftone"] .sale-bar:active {
+  transform: scale(0.99);
+}
+[data-theme="halftone"] .sale-bar-cta:active {
+  transform: scale(0.97);
+  background: var(--accent-dark);
+}
+
+/* ---------------------------------------------------------------
+   10. SECTION TITLE — hairline rule (app.css ::after) + cobalt dot
+   rail via ::before (poster nav-dots motif; ::after is the rule).
+   --------------------------------------------------------------- */
+[data-theme="halftone"] .section-title {
+  color: var(--text-secondary);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+}
+[data-theme="halftone"] .section-title::before {
+  content: "";
+  flex-shrink: 0;
+  width: 20px;
+  height: 4px;
+  background-image: radial-gradient(circle, var(--accent) 2px, transparent 2.4px);
+  background-size: 8px 8px;
+  background-position: left center;
+  background-repeat: repeat-x;
+}
+
+/* ---------------------------------------------------------------
+   11. BUTTONS + inputs — pill geometry; primary cobalt, secondary hairline
+   --------------------------------------------------------------- */
+[data-theme="halftone"] .btn-primary,
+[data-theme="halftone"] .btn-success {
+  border-radius: var(--r-pill);
+  font-weight: 500;
+}
+[data-theme="halftone"] .btn-primary {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent);
+}
+[data-theme="halftone"] .btn-primary:active {
+  transform: scale(0.98);
+  background: var(--accent-dark);
+}
+[data-theme="halftone"] .btn-secondary {
+  border-radius: var(--r-pill);
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-card);
+}
+[data-theme="halftone"] .btn-secondary:active {
+  transform: scale(0.98); background: var(--surface-2);
+}
+[data-theme="halftone"] .mini-btn:active,
+[data-theme="halftone"] .qty-btn:active,
+[data-theme="halftone"] .pay-chip:active,
+[data-theme="halftone"] .icon-btn:active,
+[data-theme="halftone"] .back-btn:active {
+  transform: scale(0.95);
+}
+[data-theme="halftone"] .pay-chip.active {
+  background: var(--accent-light); border-color: var(--accent); color: var(--accent);
+}
+/* rounded fields to match pill language */
+[data-theme="halftone"] .search-box input,
+[data-theme="halftone"] input,
+[data-theme="halftone"] select,
+[data-theme="halftone"] textarea {
+  border-radius: var(--r-md);
+}
+[data-theme="halftone"] .tab,
+[data-theme="halftone"] .badge,
+[data-theme="halftone"] .nav-badge,
+[data-theme="halftone"] .ready-chip {
+  border-radius: var(--r-pill);
+}
+
+/* ---------------------------------------------------------------
+   12. SHEET — silver panel to match
+   --------------------------------------------------------------- */
+[data-theme="halftone"] .sheet {
+  background: linear-gradient(180deg, #eef0f4, #e0e3e9);
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+}
+[data-theme="halftone"] .summary-row.total {
+  color: var(--text);
+}
+
+/* ---------------------------------------------------------------
+   13. REDUCED MOTION — gate every keyframe / press pulse
+   --------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="halftone"] .view.active .stat {
+    animation: none;
+  }
+  [data-theme="halftone"] .nav-card::before,
+  [data-theme="halftone"] .item-card::before {
+    display: none;
+  }
+}

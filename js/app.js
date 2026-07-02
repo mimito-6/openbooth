@@ -4,7 +4,7 @@
 (function () {
   window.OB = window.OB || {};
   OB.app = OB.app || {};
-  const CACHE_NAME = "openbooth-v23";
+  const CACHE_NAME = "openbooth-v24";
 
   // ---- customer-facing display ----
   let cfd = null;
@@ -94,6 +94,10 @@
     document.documentElement.dataset.theme = s.theme || "warm";
     document.documentElement.lang = s.locale === "ja" ? "ja" : s.locale === "en" ? "en" : s.locale === "ko" ? "ko" : "zh-Hant";
     OB.i18n.setLocale(s.locale);
+    // keep the browser/status-bar chrome in sync with the active theme
+    const bg = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim();
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (bg && meta) meta.setAttribute("content", bg);
   }
 
   function init() {
