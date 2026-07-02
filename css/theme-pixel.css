@@ -2,8 +2,8 @@
    OpenBooth — Theme "pixel" v2 (THE SIGNAL · black/yellow HUD)
    Rebuilt to the owner's reference: near-black observation field,
    fine white survey grid, ONE signal-yellow accent, dot-matrix
-   type EVERYWHERE (DotGothic16 covers Latin + JP + most Han
-   glyphs; anything missing falls back to system per glyph),
+   type EVERYWHERE (Cubic 11 covers Latin + JP kana + full TC Han;
+   anything missing falls back to system per glyph),
    ruler ticks, crosshairs, a barcode block, corner brackets,
    timestamp micro-labels. All selectors [data-theme="pixel"].
    AA: yellow #f2e733 on #101014 = 13.9:1; ink #ececec = 14.9:1.
@@ -29,12 +29,12 @@
   --combo-light: #161d2c;
   --danger: #ff7a70;
   --warning: #e8b84a;
-  /* dot-matrix first for EVERYTHING (Latin+JP+Han via the chunked
-     DotGothic16 css; per-glyph fallback to system when uncovered) */
-  --font-sans: "DotGothic16", -apple-system, BlinkMacSystemFont, "PingFang TC",
+  /* dot-matrix first for EVERYTHING (Latin+JP+TC Han via Cubic 11,
+     one woff2; per-glyph fallback to system when uncovered) */
+  --font-sans: "Cubic 11", "DotGothic16", -apple-system, BlinkMacSystemFont,
+    "PingFang TC", "Hiragino Sans", "Noto Sans TC", "Noto Sans JP", sans-serif;
+  --font-display: "Cubic 11", "DotGothic16", -apple-system, "PingFang TC",
     "Hiragino Sans", "Noto Sans TC", "Noto Sans JP", sans-serif;
-  --font-display: "DotGothic16", -apple-system, "PingFang TC", "Hiragino Sans",
-    "Noto Sans TC", "Noto Sans JP", sans-serif;
   --r-sm: 0px;
   --r-md: 2px;
   --r-lg: 3px;

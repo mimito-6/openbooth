@@ -1,0 +1,12 @@
+/* Cubic 11 (俐方體11號) — open-source Traditional-Chinese pixel font
+   derived from M+ gothic 12r (SIL OFL 1.1; see fonts/cubic11-OFL.txt).
+   Covers Big5 level-1 (5401), 常用國字 4808, kana, GB2312-L1, Latin —
+   full CJK pixel coverage in a single 400KB woff2, replacing the old
+   123-chunk DotGothic16 split-subset setup. */
+@font-face {
+  font-family: "Cubic 11";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/cubic11.woff2") format("woff2");
+}

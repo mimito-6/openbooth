@@ -374,12 +374,13 @@
   background-size: 20px 10px;
   background-repeat: repeat-x;
 }
-/* the ♡ marks: dot-matrix face (DotGothic16 has U+2661) — crisper, less mushy */
+/* the ♡ marks: U+2661 isn't in Cubic 11 or the DotGothic16 Latin
+   subset, so let the theme's own display face render them */
 [data-theme="meido"] .home-shop-name::before,
 [data-theme="meido"] .home-shop-name::after,
 [data-theme="meido"] .item-card.has-qty .item-name::after,
 [data-theme="meido"] .summary-row.total::before {
-  font-family: "DotGothic16", var(--font-display);
+  font-family: var(--font-display);
   font-weight: 400;
 }
 /* masthead: shop name sits on a ribbon band with notched ends */

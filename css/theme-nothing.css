@@ -36,7 +36,7 @@
   --combo-light: #e8e8ee;
   --danger: #c33a30;
   --warning: #8f6c1a;
-  --font-display: "DotGothic16", -apple-system, "PingFang TC", "Noto Sans TC", sans-serif;
+  --font-display: "DotGothic16", "Cubic 11", -apple-system, "PingFang TC", "Noto Sans TC", sans-serif;
   --r-sm: 8px;
   --r-md: 12px;
   --r-lg: 16px;
@@ -364,10 +364,10 @@
 }
 
 /* ===== polish round: dot-matrix masthead + glyph furniture ===== */
-/* the title itself goes dot-matrix — CJK shop names too, via the
-   chunked DotGothic16 (per-glyph fallback to system if uncovered) */
+/* the title itself goes dot-matrix — CJK shop names too, via
+   Cubic 11 (per-glyph fallback to system if uncovered) */
 [data-theme="nothing"] .view.active:has(> .home-hero) .home-shop-name {
-  font-family: "DotGothic16", -apple-system, "PingFang TC", "Noto Sans TC", sans-serif;
+  font-family: "DotGothic16", "Cubic 11", -apple-system, "PingFang TC", "Noto Sans TC", sans-serif;
   font-weight: 400;
   font-size: 32px;
 }
@@ -407,7 +407,7 @@
 }
 /* dot-leader rail between event line and stats */
 [data-theme="nothing"] .view.active:has(> .home-hero) .home-event-line {
-  font-family: "DotGothic16", -apple-system, "PingFang TC", "Noto Sans TC", sans-serif;
+  font-family: "DotGothic16", "Cubic 11", -apple-system, "PingFang TC", "Noto Sans TC", sans-serif;
 }
 /* stats: label dots — red dot marks the money readout */
 [data-theme="nothing"] .stat-label {
@@ -435,6 +435,6 @@
 /* sheet titles pick up the dot face too */
 [data-theme="nothing"] .sheet-title,
 [data-theme="nothing"] .title {
-  font-family: "DotGothic16", -apple-system, "PingFang TC", "Noto Sans TC", sans-serif;
+  font-family: "DotGothic16", "Cubic 11", -apple-system, "PingFang TC", "Noto Sans TC", sans-serif;
   font-weight: 400;
 }
