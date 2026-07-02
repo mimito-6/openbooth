@@ -579,7 +579,9 @@
   text-align: left;
   font-size: 38px;
   line-height: 1.04;
-  font-weight: 400; /* Archivo Black carries the weight */
+  /* 800 so CJK shop names (system fallback) render bold; Archivo Black
+     is single-weight so Latin is unaffected */
+  font-weight: 800;
   padding: 18px 10px 14px;
   margin-top: 8px;
   overflow-wrap: anywhere;

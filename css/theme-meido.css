@@ -127,14 +127,10 @@
   letter-spacing: 0.01em;
 }
 [data-theme="meido"] .home-shop-name::before {
-  content: "♡ ";
-  color: var(--accent);
-  font-weight: 400;
+  margin-right: 0.34em;
 }
 [data-theme="meido"] .home-shop-name::after {
-  content: " ♡";
-  color: var(--accent);
-  font-weight: 400;
+  margin-left: 0.34em;
 }
 [data-theme="meido"] .home-event-line {
   display: inline-block;
@@ -296,8 +292,7 @@
   border-color: var(--accent);
 }
 [data-theme="meido"] .item-card.has-qty .item-name::after {
-  content: " ♡";
-  color: var(--accent);
+  margin-left: 0.3em;
 }
 [data-theme="meido"] .qty-badge {
   border-radius: 999px;
@@ -318,9 +313,7 @@
   border-bottom: 1.5px dashed var(--accent-light);
 }
 [data-theme="meido"] .summary-row.total::before {
-  content: "♡ ";
-  color: var(--accent);
-  font-weight: 400;
+  margin-right: 0.3em;
 }
 [data-theme="meido"] .badge,
 [data-theme="meido"] .nav-badge,
@@ -374,14 +367,24 @@
   background-size: 20px 10px;
   background-repeat: repeat-x;
 }
-/* the ♡ marks: U+2661 isn't in Cubic 11 or the DotGothic16 Latin
-   subset, so let the theme's own display face render them */
+/* the heart marks: rendered as an inline SVG heart via CSS mask instead
+   of the ♡ glyph (U+2661 has no coverage in the pixel fonts and looked
+   thin/inconsistent across system fallbacks). Scales with font-size,
+   coloured by background-color, crisp everywhere. */
 [data-theme="meido"] .home-shop-name::before,
 [data-theme="meido"] .home-shop-name::after,
 [data-theme="meido"] .item-card.has-qty .item-name::after,
 [data-theme="meido"] .summary-row.total::before {
-  font-family: var(--font-display);
-  font-weight: 400;
+  content: "";
+  display: inline-block;
+  width: 0.78em;
+  height: 0.78em;
+  vertical-align: -0.09em;
+  background-color: var(--accent);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%2020.5C6%2016.5%202.5%2013%202.5%208.8%202.5%206%204.7%203.9%207.4%203.9c1.8%200%203.4%201%204.6%202.6C13.2%204.9%2014.8%203.9%2016.6%203.9%2019.3%203.9%2021.5%206%2021.5%208.8c0%204.2-3.5%207.7-9.5%2011.7z'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%2020.5C6%2016.5%202.5%2013%202.5%208.8%202.5%206%204.7%203.9%207.4%203.9c1.8%200%203.4%201%204.6%202.6C13.2%204.9%2014.8%203.9%2016.6%203.9%2019.3%203.9%2021.5%206%2021.5%208.8c0%204.2-3.5%207.7-9.5%2011.7z'/%3E%3C/svg%3E")
+    center / contain no-repeat;
 }
 /* masthead: shop name sits on a ribbon band with notched ends */
 [data-theme="meido"] .view.active:has(> .home-hero) .home-shop-name {
@@ -399,7 +402,7 @@
 }
 [data-theme="meido"] .view.active:has(> .home-hero) .home-shop-name::before,
 [data-theme="meido"] .view.active:has(> .home-hero) .home-shop-name::after {
-  color: var(--on-accent);
+  background-color: var(--on-accent);
 }
 /* menu-board label on the stats card */
 [data-theme="meido"] .stats::after {
