@@ -10,9 +10,11 @@
 
 /* ---------------------------------------------------------------
    1. TOKENS — self-contained (all 18 colours + structural overrides)
-   AA/AAA verified on silver: text 12.9:1, text-secondary 6.0:1,
-   accent 6.8:1 (on surface), on-accent 6.5:1 (on cobalt). Muted
-   grey is decoration-only; --text keeps ≥7:1 headroom everywhere.
+   Contrast measured against the WORST-CASE composited backdrop, i.e.
+   the most transparent end of --glass-bg over the darkest stop of the
+   body ramp (#c9ccd4), not against the flat --surface swatch:
+   text 11.6:1, text-secondary 4.8:1, accent 5.7:1, on-accent 6.7:1.
+   Re-measure these numbers whenever --glass-bg or the ramp changes.
    --------------------------------------------------------------- */
 [data-theme="halftone"] {
   --bg: #dfe2e8;            /* solid fallback; body paints the gradient */
@@ -21,17 +23,17 @@
   --border: #c5c9d1;        /* hairline */
   --border-strong: #9aa0aa; /* stronger rule */
   --text: #23262c;          /* cool ink */
-  --text-secondary: #5a5f6a;/* legible grey (AA) */
-  --text-muted: #868c96;    /* AA-large / decoration only */
+  --text-secondary: #4e535e;/* AA on glass over the ramp's darkest stop */
+  --text-muted: #5f656e;    /* used by .si-val body copy — must clear AA too */
   --accent: #2244d4;        /* cobalt — money / dates / CTA ONLY */
   --accent-dark: #182f9e;
   --accent-light: #dde3f8;
   --on-accent: #f2f4ff;
-  --success: #227a4b;
+  --success: #207246;
   --success-light: #dcecdf;
   --combo: #4b41a8;
   --combo-light: #e2e0f4;
-  --danger: #c02a2a;
+  --danger: #b02525;
   --warning: #8a5a0e;
   /* structural: very round pills; liquid-glass shadows — one soft
      diffuse drop + a specular top highlight, never tight dark smudges */
@@ -47,9 +49,10 @@
   --shadow-float: 0 14px 34px rgba(35, 38, 44, 0.13),
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
   --shadow-sheet: 0 -10px 30px rgba(35, 38, 44, 0.12);
-  /* shared liquid-glass surface recipe */
-  --glass-bg: linear-gradient(160deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.42));
-  --glass-border: rgba(255, 255, 255, 0.72);
+  /* shared liquid-glass surface recipe — kept genuinely translucent so the
+     blur and the specular edge read; near-opaque white washed both out */
+  --glass-bg: linear-gradient(160deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.26));
+  --glass-border: rgba(255, 255, 255, 0.9);
   /* reusable dot-matrix layer (regular grid, dark dots) */
   --ht-dot: radial-gradient(circle, rgba(35, 38, 44, 0.10) 1px, transparent 1.3px);
 }
@@ -88,25 +91,10 @@
 }
 
 /* ---------------------------------------------------------------
-   3. BODY — silver sheen gradient + fixed halftone dot layer,
-   density fading top→bottom via mask. Static, pointer-events:none.
+   3. BODY — silver sheen gradient + halftone dot layer.
+   Both live at the end of this file (§14); defining them here too
+   only created dead rules that the later ones fully overrode.
    --------------------------------------------------------------- */
-[data-theme="halftone"] body {
-  background:
-    linear-gradient(180deg, #eceef2 0%, #dfe2e8 45%, #c7cad2 100%) fixed;
-}
-[data-theme="halftone"] body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.6;
-  background-image: var(--ht-dot);
-  background-size: 7px 7px;
-  -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.25) 60%, transparent 100%);
-  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.25) 60%, transparent 100%);
-}
 
 /* motion timing — transform/opacity only */
 [data-theme="halftone"] .nav-card,
@@ -206,13 +194,15 @@
   border: 1px solid var(--glass-border);
   border-radius: var(--r-pill);
   box-shadow: var(--shadow-card);
-  padding: 12px 16px;
+  /* 16px side padding left the two narrow stats ~39px of text width, so
+     「交易筆數」wrapped and orphaned its last glyph */
+  padding: 12px 10px;
   text-align: left;
 }
 [data-theme="halftone"] .stat-label {
   font-size: 11px;
   color: var(--text-secondary);
-  letter-spacing: 0.04em;
+  letter-spacing: 0; /* tracking on a CJK label costs width and buys nothing */
 }
 [data-theme="halftone"] .stat-value {
   font-weight: 300;         /* light + big, poster style */
@@ -271,6 +261,8 @@
   background: var(--text);
   color: var(--bg);
   border-color: var(--text);
+  /* drop the inherited raised glass highlight — this one is ink-filled */
+  box-shadow: inset 0 1px 2px rgba(10, 12, 16, 0.35);
 }
 [data-theme="halftone"] .tab:active {
   transform: scale(0.96);
@@ -415,6 +407,7 @@
 }
 [data-theme="halftone"] .btn-secondary:active {
   transform: scale(0.98); background: var(--surface-2);
+  box-shadow: inset 0 1px 3px rgba(35, 38, 44, 0.16);
 }
 [data-theme="halftone"] .mini-btn:active,
 [data-theme="halftone"] .qty-btn:active,
@@ -554,16 +547,21 @@
 }
 
 /* --- material push: brighter metal ramp; halftone stays a whisper
-   BEHIND the glass (was z-index 6 over the cards — read as grime) --- */
+   BEHIND the glass.
+   z-index MUST be negative: `fixed` + z-index:0 paints in the positioned
+   layer, and tree order puts body::after after the content, so 0 still
+   printed the dots ON TOP of every card — that was the "grime". Negative
+   z-index drops it below the content but still above the canvas, so the
+   cards' backdrop-filter can actually refract it. --- */
 [data-theme="halftone"] body {
-  background: linear-gradient(175deg, #f0f2f6 0%, #d6d9e0 46%, #e6e8ee 72%, #c9ccd4 100%);
+  background: linear-gradient(175deg, #f0f2f6 0%, #d6d9e0 46%, #e6e8ee 72%, #c9ccd4 100%) fixed;
 }
 [data-theme="halftone"] body::after {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 0;
+  z-index: -1;
   opacity: 0.5;
   background-image: radial-gradient(circle, rgba(35, 38, 44, 0.12) 1px, transparent 1.4px);
   background-size: 6px 6px;
@@ -591,6 +589,23 @@
   margin: 0;
   width: 100%;
   max-width: none;
+}
+
+/* engines without backdrop-filter get no blur, so the 26%-white end of
+   --glass-bg would sit raw over the ramp — pay them an opaque surface
+   instead. (Cannot cover the "supports it but compositing is off" case.) */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  [data-theme="halftone"] .nav-card,
+  [data-theme="halftone"] .item-card,
+  [data-theme="halftone"] .stat,
+  [data-theme="halftone"] .ready-chip,
+  [data-theme="halftone"] .view.active:has(> .home-hero) .home-mascot-fallback {
+    background: rgba(255, 255, 255, 0.88);
+  }
+  [data-theme="halftone"] .sale-bar,
+  [data-theme="halftone"] .sheet {
+    background: rgba(250, 251, 253, 0.97);
+  }
 }
 
 /* --- liquid-glass decorations --------------------------------- */

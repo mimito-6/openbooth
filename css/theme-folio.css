@@ -16,12 +16,12 @@
   --border-strong: #2653e8; /* cobalt ink line */
   --text: #14181f;          /* near-black ink — 17.8:1 on white */
   --text-secondary: #5a6784;/* 5.7:1 on white */
-  --text-muted: #8b97b3;    /* decoration/hints only */
+  --text-muted: #607093;    /* 4.5:1 — .si-val uses it as body copy */
   --accent: #2653e8;        /* cobalt — used generously (two-tone) */
   --accent-dark: #1c3fc0;   /* darker cobalt for text-on-white (8.3:1) */
   --accent-light: #e4eaff;  /* pale blue fill */
   --on-accent: #ffffff;     /* white on cobalt — 6:1 */
-  --success: #1f8a52;
+  --success: #1c7b49;
   --success-light: #dff2e7;
   --combo: #6a3fd0;
   --combo-light: #ebe3fb;
@@ -109,28 +109,16 @@
 }
 [data-theme="folio"] .nav-card {
   counter-increment: folio-nav;
-  position: relative;           /* for folder tab + index */
-  overflow: visible;            /* let the tab stick up */
-  margin-top: 9px;              /* room for the protruding tab */
+  position: relative;           /* for the index number */
   background: var(--surface);
   border: 2px solid var(--accent);
   border-radius: 3px var(--r-md) var(--r-md) var(--r-md); /* asymmetric folder corner */
   box-shadow: var(--shadow-card);
   padding: 20px 10px 16px;
 }
-/* folder TAB notch sticking up from the top-left edge */
-[data-theme="folio"] .nav-card::before {
-  content: "";
-  position: absolute;
-  top: -9px;
-  left: 12px;
-  width: 40px;
-  height: 11px;
-  background: var(--surface);
-  border: 2px solid var(--accent);
-  border-bottom: none;
-  border-radius: 5px 5px 0 0;
-}
+/* (the folder-tab notch that used to live here was turned off wholesale
+   further down; its rule and the 9px of reserved margin were dead weight
+   that doubled the real row gap, so both are gone) */
 /* tiny cobalt index number "01"–"06" in the top-right corner (Latin, safe) */
 [data-theme="folio"] .nav-card::after {
   content: "N°" counter(folio-nav, decimal-leading-zero);
@@ -158,9 +146,6 @@
   background: var(--accent);
   border-color: var(--accent);
   box-shadow: none;
-}
-[data-theme="folio"] .nav-card:active::before {
-  background: var(--accent);
 }
 [data-theme="folio"] .nav-card:active::after {
   color: var(--on-accent);
@@ -285,7 +270,7 @@
 }
 [data-theme="folio"] .sale-bar-count {
   color: var(--on-accent);
-  opacity: 0.75;
+  opacity: 0.9; /* 0.75 fell under AA against the cobalt shelf */
 }
 /* white outlined "printed" CTA button on the cobalt bar */
 [data-theme="folio"] .sale-bar-cta {
@@ -354,7 +339,7 @@
   letter-spacing: 0.06em; /* Latin digits only — safe */
   color: var(--accent);
   margin-right: 8px;
-  opacity: 0.7;
+  opacity: 0.9; /* 0.7 dropped these catalog numbers to 3.2:1 */
 }
 [data-theme="folio"] .list-amount {
   color: var(--text);
@@ -366,10 +351,18 @@
   border-bottom: 1.5px solid var(--border);
 }
 
-/* ---- Search box — outlined cobalt hairline, focus goes cobalt ---- */
+/* ---- Form controls — these need a boundary you can actually find, so
+   they get a darker line than the decorative --border hairline (which
+   stays pale on purpose: it is the card/divider texture, not a control) ---- */
+[data-theme="folio"] .search-box input,
+[data-theme="folio"] input,
+[data-theme="folio"] select,
+[data-theme="folio"] textarea {
+  border-color: #7d96ee; /* 3.0:1 on white — meets non-text contrast */
+}
 [data-theme="folio"] .search-box input {
   background: var(--surface);
-  border: 1.5px solid var(--border);
+  border: 1.5px solid #7d96ee;
 }
 [data-theme="folio"] .search-box input:focus {
   outline: none;
@@ -411,7 +404,7 @@
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 0;
+  z-index: -1; /* positioned + z-index:0 still painted over the copy */
   opacity: 0.5;
   background-image:
     linear-gradient(to right, rgba(38, 83, 232, 0.045) 1px, transparent 1px),
@@ -511,10 +504,6 @@
   text-align: left;
   padding: 13px 16px;
 }
-/* the folder tab reads wrong on rows — number badge carries the identity */
-[data-theme="folio"] .nav-card::before {
-  display: none;
-}
 [data-theme="folio"] .nav-card::after {
   position: static;
   order: -1;
@@ -567,26 +556,12 @@
 /* ============================================================
    Decorative pass — editorial print furniture (all Latin/geometry,
    CJK-safe, pointer-events-free, static).
+   NOTE: registration crosses were originally pinned to the viewport
+   corners. On a phone the content column IS the viewport, so they
+   landed on the mascot, under the header, and behind the sale-bar —
+   print trim marks need bleed area that simply does not exist here.
+   They now live in the colophon row, which owns its whitespace.
    ============================================================ */
-/* registration crosses in opposite corners — the blueprint's "+" marks */
-[data-theme="folio"] body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.55;
-  background-image:
-    linear-gradient(var(--accent), var(--accent)),
-    linear-gradient(var(--accent), var(--accent)),
-    linear-gradient(var(--accent), var(--accent)),
-    linear-gradient(var(--accent), var(--accent));
-  background-size: 14px 2px, 2px 14px, 14px 2px, 2px 14px;
-  background-position:
-    right 24px top 76px, right 30px top 70px,
-    left 24px bottom 36px, left 30px bottom 30px;
-  background-repeat: no-repeat;
-}
 /* micro-label kicker above the huge cobalt title */
 [data-theme="folio"] .view.active:has(> .home-hero) .home-shop-name::before {
   content: "CATALOGUE";
@@ -614,22 +589,28 @@
   content: " →"; /* Latin arrow, safe next to CJK label */
   font-weight: 700;
 }
-/* catalog colophon under the nav rows: barcode + imprint line */
+/* catalog colophon under the nav rows: barcode left, registration
+   cross right, imprint line beneath — the page's printer's mark */
 [data-theme="folio"] .view.active:has(> .home-hero) .nav-grid::after {
-  content: "OPENBOOTH \00AE  PRINTED IN CATALOG FORM";
+  content: "OPENBOOTH® PRINTED IN CATALOG FORM";
   display: block;
   margin-top: 10px;
   padding-top: 30px;
-  background: repeating-linear-gradient(90deg,
+  background-image:
+    repeating-linear-gradient(90deg,
       var(--text) 0 2px, transparent 2px 5px,
       var(--text) 5px 6px, transparent 6px 12px,
-      var(--text) 12px 15px, transparent 15px 18px)
-    top left / 130px 22px no-repeat;
+      var(--text) 12px 15px, transparent 15px 18px),
+    linear-gradient(var(--accent), var(--accent)),
+    linear-gradient(var(--accent), var(--accent));
+  background-size: 130px 22px, 13px 1.5px, 1.5px 13px;
+  background-position: top left, right 0 top 10px, right 5.75px top 4px;
+  background-repeat: no-repeat;
   font-family: var(--font-display);
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.18em; /* Latin-only pseudo content — safe */
-  color: var(--text-muted);
+  color: var(--text-secondary); /* --text-muted read 2.7:1 here */
 }
 
 /* fix: with a locked-column badge, auto-placement pushed icon/name to row 2 —

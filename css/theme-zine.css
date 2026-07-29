@@ -1,6 +1,7 @@
 /* ============================================================
    OpenBooth — Theme "zine" (ASCII doujin party flyer)
-   Warm cream paper, a royal-blue ASCII texture mural under
+   Cool grey-blue photocopy paper (zero warm tint — the earlier cream
+   read as yellow), a royal-blue ASCII texture mural under
    everything, crimson-magenta condensed display type, mono
    typewriter energy, misregistered-print offset shadows and
    rotated sticker panels. Hand-assembled fan-zine, not a template.
@@ -36,16 +37,16 @@
   --surface-2: #d9dde3; /* recessed cool gray */
   --border: #24242a; /* ink hairline (shape from ink, not tint) */
   --border-strong: #24242a; /* heavy ink */
-  --text: #24242a; /* deep ink — 12.4:1 on cream */
+  --text: #24242a; /* deep ink — 14.5:1 on the cool paper */
   --text-secondary: #4c4c56; /* 8.0:1 */
-  --text-muted: #6f6f79; /* 4.6:1 — hints only */
-  --accent: #c81e56; /* crimson-magenta — 5.6:1 on cream (large + chrome) */
-  --accent-dark: #a41345; /* 7.6:1 — safe for small text / values */
+  --text-muted: #5f5f69; /* 5.3:1 — also carries .si-val body copy */
+  --accent: #c81e56; /* crimson-magenta — 5.6:1 (large + chrome) */
+  --accent-dark: #a41345; /* 7.2:1 — safe for small text / values */
   --accent-light: #fbe4ec; /* pale pink fill */
   --on-accent: #ffffff; /* pure white on magenta — no warm cast */
   --success: #1f7a46;
   --success-light: #dff0e4;
-  --combo: #2b58c8; /* royal ASCII blue — the second voice */
+  --combo: #244aa8; /* royal ASCII blue — darkened to clear AA over the mural */
   --combo-light: #e2e8fa;
   --danger: #c0271b;
   --warning: #9a6b0f;
@@ -331,9 +332,11 @@
   border-radius: 3px;
 }
 
-/* ---------- 11 · Sale bar: cream tear-line strip + magenta CTA ---------- */
+/* ---------- 11 · Sale bar: torn-strip panel + magenta CTA ---------- */
 [data-theme="zine"] .sale-bar {
-  background: var(--bg);
+  /* was var(--bg) — identical to the page, so the bar read as a stray
+     dashed line rather than a panel sitting on top of the sheet */
+  background: var(--surface);
   border-top: 2px dashed var(--border-strong); /* tear line */
   box-shadow: none;
 }
@@ -343,6 +346,7 @@
 }
 [data-theme="zine"] .sale-bar-count {
   color: var(--text-secondary);
+  opacity: 1; /* app.css dims this to .7, which drops it under AA */
 }
 [data-theme="zine"] .sale-bar-cta {
   background: var(--accent);
@@ -550,6 +554,8 @@
   border: 1.5px dashed var(--text);
   padding: 10px;
   gap: 0;
+  /* the ASCII mural was showing straight through behind the figures */
+  background: var(--surface);
 }
 [data-theme="zine"] .stat {
   border: none;

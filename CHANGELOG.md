@@ -6,14 +6,13 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 ## [0.3.0] — 2026-07
 
 A big design round: an inline-SVG icon system (no more emoji), a jump from
-5 to **18 switchable themes**, and a self-hosted pixel font with full
+5 to **16 switchable themes**, and a self-hosted pixel font with full
 Traditional-Chinese coverage.
 
 ### Added
-- **18 themes**, up from 5. Beyond the original warm/handmade set:
-  - **Prototype design themes**: koishi (warm plaster / pebble claymorphism),
-    linen, graphite, sage, sabi (錆 wabi-sabi).
-  - **Metallic / futuristic**: titanium, gunmetal, chrome.
+- **16 themes**, up from 5. Beyond the original warm/handmade set:
+  - **Design themes**: koishi (warm plaster / pebble claymorphism), linen,
+    graphite, sage.
   - **Reference-driven bold layouts (v2 round)**: folio, halftone, zine, spec,
     pixel (THE SIGNAL black/yellow HUD).
   - **Character themes**: meido (メイド café), nothing (Nothing-OS dot-matrix

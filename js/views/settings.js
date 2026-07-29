@@ -31,7 +31,7 @@
     // v2 reference-driven bold-layout themes
     { id: "folio", dots: ["#2653e8", "#f2f4fa", "#14181f"] }, // blue/white portfolio editorial
     { id: "halftone", dots: ["#2244d4", "#dfe2e8", "#5a5f6a"] }, // swiss silver halftone
-    { id: "zine", dots: ["#c81e56", "#f3efdf", "#2b58c8"] }, // ascii doujin zine
+    { id: "zine", dots: ["#c81e56", "#e9ebee", "#2b58c8"] }, // ascii doujin zine
     { id: "spec", dots: ["#e84e14", "#f6f5f1", "#171715"] }, // industrial spec sheet
     { id: "pixel", dots: ["#f2e733", "#101014", "#4a4a55"] }, // signal black/yellow HUD
     { id: "meido", dots: ["#d9578b", "#fbeff1", "#8a6fb8"] }, // maid-café cute
