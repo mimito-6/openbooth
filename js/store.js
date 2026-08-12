@@ -38,6 +38,12 @@
         enableCombos: true,
         requireCash: true,
         showReceipt: false,
+        // --- receipt printer (see js/printer.js; the adapter owns the
+        // profile→dots mapping, nothing here encodes dot widths) ---
+        autoPrint: false,
+        printerProfile: "gprinter-ble-80",
+        paperProfile: "80mm",
+        transmissionMode: "standard",
         helperPin: "",
         notifyTemplate: "",
         mascot: null,
@@ -68,11 +74,30 @@
   }
 
   // ---------- persistence ----------
+  // Auto-print used to live in the receipt add-on's own localStorage. OpenBooth
+  // owns printing now, so adopt the seller's existing choice rather than
+  // silently resetting it to off. Runs only until autoPrint is persisted here.
+  function adoptLegacyAutoPrint() {
+    try {
+      const legacy = JSON.parse(localStorage.getItem("openbooth_receipt_settings_v1") || "{}");
+      if (legacy && typeof legacy.autoPrint === "boolean") {
+        state.settings.autoPrint = legacy.autoPrint;
+        save();
+      }
+    } catch (e) {}
+  }
+
   function load() {
+    // Whether the PERSISTED state already carried an explicit autoPrint. Checked
+    // before ensureIntegrity() backfills the default, and on both the
+    // existing-state and fresh-install paths.
+    let hadAutoPrint = false;
     try {
       const raw = localStorage.getItem(KEY);
       if (raw) {
-        state = migrate(JSON.parse(raw));
+        const parsed = JSON.parse(raw);
+        hadAutoPrint = !!(parsed && parsed.settings && parsed.settings.autoPrint !== undefined);
+        state = migrate(parsed);
       } else {
         state = defaultState();
         save();
@@ -82,6 +107,7 @@
       state = defaultState();
     }
     ensureIntegrity();
+    if (!hadAutoPrint) adoptLegacyAutoPrint();
     try {
       cart = JSON.parse(localStorage.getItem(CART_KEY)) || emptyCart();
     } catch (e) {

@@ -69,6 +69,11 @@
     <script src="js/views/pay.js"></script>
     <script src="js/views/record.js"></script>
     <script src="js/views/settings.js"></script>
+    <!-- printing: OB.printer is the ONLY adapter onto receipt-engine;
+         OB.printFlow owns the seller-facing messages. Both load before
+         boot so views can find them, and both no-op without the engine. -->
+    <script src="js/printer.js"></script>
+    <script src="js/print-flow.js"></script>
     <!-- boot -->
     <script src="js/app.js"></script>
 

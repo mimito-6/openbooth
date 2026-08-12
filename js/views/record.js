@@ -67,6 +67,13 @@
 
     // transaction list
     const sec = el("section", { class: "section" }, [el("h2", { class: "section-title", text: t("records") })]);
+    if (txs.length && OB.printFlow) {
+      sec.appendChild(
+        el("div", { style: "padding:0 0 10px" }, [
+          el("button", { class: "btn btn-secondary btn-block", html: OB.icon("receipt", 15) + " " + esc(t("reprint_last")), onclick: () => OB.printFlow.reprintLast() }),
+        ])
+      );
+    }
     if (!txs.length) {
       sec.appendChild(OB.ui.emptyState("receipt", t("no_records")));
     } else {
@@ -80,12 +87,17 @@
             tx.giftNote ? el("div", { class: "list-sub", html: OB.icon("gift", 13) + " " + esc(tx.giftNote) }) : null,
           ])
         );
-        row.appendChild(
-          el("div", { class: "list-end" }, [
-            el("div", { class: "list-amount", text: fmtMoney(tx.grandTotal) }),
-            el("button", { class: "mini-btn", style: "margin-top:6px", text: t("undo"), onclick: () => undo(tx) }),
-          ])
-        );
+        const endCol = el("div", { class: "list-end" }, [el("div", { class: "list-amount", text: fmtMoney(tx.grandTotal) })]);
+        const rowActions = el("div", { style: "display:flex;gap:6px;margin-top:6px;justify-content:flex-end" }, [
+          el("button", { class: "mini-btn", text: t("undo"), onclick: () => undo(tx) }),
+        ]);
+        // Reprint renders this stored transaction again — it never creates,
+        // edits, or re-saves anything.
+        if (OB.printFlow) {
+          rowActions.appendChild(el("button", { class: "mini-btn", text: t("reprint"), onclick: () => OB.printFlow.reprint(tx) }));
+        }
+        endCol.appendChild(rowActions);
+        row.appendChild(endCol);
         sec.appendChild(row);
       });
     }

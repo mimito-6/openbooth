@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <title>OpenBooth — printer flow tests</title>
+    <style>
+      body { font: 14px/1.6 system-ui, "PingFang TC", sans-serif; margin: 24px; max-width: 900px; }
+      h1 { font-size: 18px; }
+      #out { border: 1px solid #ddd; border-radius: 8px; padding: 12px; }
+      .t { padding: 6px 0; border-bottom: 1px solid #f0f0f0; display: flex; gap: 10px; }
+      .t:last-child { border-bottom: none; }
+      .badge { font-weight: 700; min-width: 52px; }
+      .pass .badge { color: #1a7f4b; }
+      .fail .badge { color: #c02626; }
+      .why { color: #666; }
+      #sum { margin-top: 14px; font-weight: 700; }
+    </style>
+  </head>
+  <body>
+    <h1>OpenBooth printer flow — headless checks</h1>
+    <p>
+      Runs against the real app modules with a <strong>mock printer</strong>. No Bluetooth, no
+      device. Open this file over the same server that serves the app.
+    </p>
+    <div id="out"></div>
+    <div id="sum"></div>
+
+    <!-- app modules under test -->
+    <script src="../js/i18n.js"></script>
+    <script src="../js/util.js"></script>
+    <script src="../js/icons.js"></script>
+    <script src="../js/components.js"></script>
+    <script src="../js/store.js"></script>
+    <script src="../js/pricing.js"></script>
+    <script src="../js/inventory.js"></script>
+    <script src="../js/printer.js"></script>
+    <script src="../js/print-flow.js"></script>
+
+    <script>
+      /* ---------- tiny harness ---------- */
+      const results = [];
+      function check(name, cond, why) {
+        results.push({ name, ok: !!cond, why: why || "" });
+      }
+      async function run(name, fn) {
+        try {
+          await fn();
+        } catch (e) {
+          results.push({ name: name + " (threw)", ok: false, why: String((e && e.message) || e) });
+        }
+      }
+      function report() {
+        const out = document.getElementById("out");
+        results.forEach((r) => {
+          const d = document.createElement("div");
+          d.className = "t " + (r.ok ? "pass" : "fail");
+          d.innerHTML =
+            '<span class="badge">' + (r.ok ? "PASS" : "FAIL") + "</span><span>" +
+            r.name + (r.why ? ' <span class="why">— ' + r.why + "</span>" : "") + "</span>";
+          out.appendChild(d);
+        });
+        const bad = results.filter((r) => !r.ok).length;
+        document.getElementById("sum").textContent =
+          results.length - bad + " / " + results.length + " passed" + (bad ? " — " + bad + " FAILED" : "");
+        document.title = (bad ? "FAIL " : "PASS ") + document.title;
+        window.__RESULTS__ = { total: results.length, failed: bad, results };
+      }
+
+      /* ---------- mock receipt-engine ----------
+         Mirrors the real ReceiptBridge surface the adapter uses. printReceiptSvg
+         records the call instead of touching hardware; flip mock.failNext to
+         simulate a printer that dies mid-job. */
+      const mock = {
+        calls: [],
+        failNext: false,
+        connected: false,
+        connectShouldFail: false,
+      };
+      class MockPrinter {
+        static get supported() { return true; }
+        get connected() { return mock.connected; }
+        get name() { return "MockPrinter"; }
+        async connect() {
+          if (mock.connectShouldFail) throw new Error("GATT operation failed");
+          mock.connected = true;
+        }
+        disconnect() { mock.connected = false; }
+      }
+      window.ReceiptBridge = {
+        version: "mock",
+        importOpenBoothOrder: (tx) => ({ receipt: { id: tx.id }, metadata: {} }),
+        applyTemplate: (doc) => doc,
+        ensureValid: (doc) => doc,
+        renderReceiptToSvg: () => "<svg/>",
+        BluetoothThermalPrinter: MockPrinter,
+        printReceiptSvg: async (svg, printer, opts) => {
+          if (mock.failNext) { mock.failNext = false; throw new Error("GATT write failed"); }
+          mock.calls.push({ svg, opts });
+        },
+      };
+      // Web Bluetooth + secure context are required by the adapter's support()
+      if (!navigator.bluetooth) {
+        Object.defineProperty(navigator, "bluetooth", { value: {}, configurable: true });
+      }
+
+      /* ---------- fixtures ---------- */
+      function freshStore() {
+        localStorage.clear();
+        OB.store.load();
+        const st = OB.store.get();
+        st.settings.shopName = "TestBooth";
+        OB.store.commit();
+        return st;
+      }
+      function sampleTx() {
+        return {
+          lines: [{ kind: "product", refId: "p1", name: "貼紙", unitPrice: 100, basePrice: 100, qty: 2, lineTotal: 200, isTokuten: false }],
+          subtotal: 200, discount: 0, bundleSaved: 0, grandTotal: 200,
+          stockUse: {}, paymentMethodId: null, paymentMethodName: "現金", paymentType: "cash",
+          cashReceived: 200, changeGiven: 0, giftNote: "",
+        };
+      }
+      const settle = () => new Promise((r) => setTimeout(r, 30));
+
+      /* ---------- tests ---------- */
+      (async function () {
+        // 1. transaction is saved before any print work
+        await run("1. transaction saves first", async () => {
+          freshStore();
+          mock.calls = [];
+          const saved = OB.store.addTransaction(sampleTx());
+          check("1. transaction persisted with an id", !!saved.id, "id=" + saved.id);
+          const raw = JSON.parse(localStorage.getItem("openbooth_v3"));
+          check("1. transaction is in localStorage before printing", raw.transactions.some((x) => x.id === saved.id));
+          check("1. nothing printed by the save itself", mock.calls.length === 0);
+        });
+
+        // 2. a print failure must not touch the transaction
+        await run("2. print failure leaves the sale intact", async () => {
+          freshStore();
+          const st = OB.store.get();
+          st.settings.autoPrint = true;
+          OB.store.commit();
+          mock.connected = true;
+          mock.failNext = true;
+          const saved = OB.store.addTransaction(sampleTx());
+          const before = OB.store.get().transactions.length;
+          const res = await OB.printer.printTransaction(saved);
+          await settle();
+          const after = OB.store.get();
+          check("2. print reported failure", res.ok === false);
+          check("2. failure message is human, not a DOMException", !!res.error && !/GATT|DOMException|characteristic/i.test(res.error.message), res.error && res.error.message);
+          check("2. transaction count unchanged", after.transactions.length === before);
+          check("2. transaction not voided", after.transactions.find((x) => x.id === saved.id).voided === false);
+          check("2. adapter state is failed", OB.printer.getState() === "failed");
+        });
+
+        // 3. auto print OFF must not print
+        await run("3. auto-print off", async () => {
+          freshStore();
+          const st = OB.store.get();
+          st.settings.autoPrint = false;
+          OB.store.commit();
+          mock.connected = true;
+          mock.calls = [];
+          const saved = OB.store.addTransaction(sampleTx());
+          OB.printFlow.afterCheckout(saved);
+          await settle();
+          check("3. no print job was sent", mock.calls.length === 0);
+        });
+
+        // 4. auto print ON prints
+        await run("4. auto-print on", async () => {
+          freshStore();
+          const st = OB.store.get();
+          st.settings.autoPrint = true;
+          OB.store.commit();
+          mock.connected = true;
+          mock.calls = [];
+          const saved = OB.store.addTransaction(sampleTx());
+          OB.printFlow.afterCheckout(saved);
+          await settle();
+          check("4. exactly one print job was sent", mock.calls.length === 1, "calls=" + mock.calls.length);
+        });
+
+        // 5. disconnected printer → sale still done, clear notice, no print
+        await run("5. printer disconnected", async () => {
+          freshStore();
+          const st = OB.store.get();
+          st.settings.autoPrint = true;
+          OB.store.commit();
+          mock.connected = false;
+          mock.calls = [];
+          const saved = OB.store.addTransaction(sampleTx());
+          OB.printFlow.afterCheckout(saved);
+          await settle();
+          check("5. no print attempted while disconnected", mock.calls.length === 0);
+          const note = document.querySelector(".print-notice");
+          check("5. a notice is shown", !!note);
+          const txt = note ? note.textContent : "";
+          check("5. notice says the SALE COMPLETED", /交易已完成|完了|completed|거래 완료/i.test(txt), txt.slice(0, 60));
+          check("5. notice offers reconnect", /重新連接|再接続|Reconnect|다시 연결/i.test(txt));
+          check("5. transaction still stored", OB.store.get().transactions.some((x) => x.id === saved.id));
+          if (note) note.remove();
+        });
+
+        // 6. reprint must not create a transaction
+        await run("6. reprint creates nothing", async () => {
+          freshStore();
+          mock.connected = true;
+          mock.calls = [];
+          const saved = OB.store.addTransaction(sampleTx());
+          const before = OB.store.get().transactions.length;
+          const beforeJson = localStorage.getItem("openbooth_v3");
+          await OB.printFlow.reprint(saved);
+          await settle();
+          const after = OB.store.get();
+          check("6. one print job sent", mock.calls.length === 1);
+          check("6. transaction count unchanged", after.transactions.length === before, before + " → " + after.transactions.length);
+          check("6. stored state byte-identical", localStorage.getItem("openbooth_v3") === beforeJson);
+          document.querySelectorAll(".print-notice").forEach((n) => n.remove());
+        });
+
+        // 7. reprint last picks the newest non-voided sale
+        await run("7. reprint last", async () => {
+          freshStore();
+          mock.connected = true;
+          mock.calls = [];
+          OB.store.addTransaction(sampleTx());
+          const second = OB.store.addTransaction(sampleTx());
+          const last = OB.printFlow.lastTransaction();
+          check("7. last transaction is the newest", last && last.id === second.id);
+          OB.store.voidTransaction(second.id);
+          const afterVoid = OB.printFlow.lastTransaction();
+          check("7. voided sales are skipped", afterVoid && afterVoid.id !== second.id);
+          document.querySelectorAll(".print-notice").forEach((n) => n.remove());
+        });
+
+        // 8. history reprint path is the same code, still non-mutating
+        await run("8. history reprint", async () => {
+          freshStore();
+          mock.connected = true;
+          const a = OB.store.addTransaction(sampleTx());
+          OB.store.addTransaction(sampleTx());
+          mock.calls = [];
+          const beforeJson = localStorage.getItem("openbooth_v3");
+          await OB.printFlow.reprint(a); // an OLD transaction, not the last
+          await settle();
+          check("8. old transaction printed", mock.calls.length === 1);
+          check("8. store untouched", localStorage.getItem("openbooth_v3") === beforeJson);
+          document.querySelectorAll(".print-notice").forEach((n) => n.remove());
+        });
+
+        // 9. mock printer / dot width comes from the profile, never hardcoded
+        await run("9. paper profile drives dots", async () => {
+          freshStore();
+          mock.connected = true;
+          const st = OB.store.get();
+          st.settings.printerProfile = "generic-58";
+          st.settings.paperProfile = "58mm";
+          OB.store.commit();
+          mock.calls = [];
+          const tx58 = OB.store.addTransaction(sampleTx());
+          await OB.printer.printTransaction(tx58);
+          await settle();
+          check("9. 58mm profile sends 384 dots", mock.calls[0] && mock.calls[0].opts.dots === 384, "dots=" + (mock.calls[0] && mock.calls[0].opts.dots));
+
+          const st2 = OB.store.get();
+          st2.settings.printerProfile = "gprinter-ble-80";
+          st2.settings.paperProfile = "80mm";
+          OB.store.commit();
+          mock.calls = [];
+          await OB.printer.printTransaction(tx58);
+          await settle();
+          check("9. 80mm profile sends 576 dots", mock.calls[0] && mock.calls[0].opts.dots === 576, "dots=" + (mock.calls[0] && mock.calls[0].opts.dots));
+          document.querySelectorAll(".print-notice").forEach((n) => n.remove());
+        });
+
+        // 10. state machine transitions the UI can observe
+        await run("10. printer state events", async () => {
+          freshStore();
+          mock.connected = false;
+          mock.connectShouldFail = false;
+          const seen = [];
+          const off = OB.printer.subscribe((s) => seen.push(s));
+          await OB.printer.connect();
+          check("10. connect emits connecting → connected", seen.indexOf("connecting") >= 0 && seen.indexOf("connected") > seen.indexOf("connecting"), seen.join(" → "));
+          seen.length = 0;
+          const tx = OB.store.addTransaction(sampleTx());
+          await OB.printer.printTransaction(tx);
+          check("10. print emits printing → success", seen.indexOf("printing") >= 0 && seen.indexOf("success") > seen.indexOf("printing"), seen.join(" → "));
+          seen.length = 0;
+          OB.printer.disconnect();
+          check("10. disconnect emits disconnected", seen.indexOf("disconnected") >= 0, seen.join(" → "));
+          off();
+          seen.length = 0;
+          OB.printer.disconnect();
+          check("10. unsubscribe stops delivery", seen.length === 0);
+        });
+
+        // 11. fresh install defaults to 80mm (spec item 4)
+        await run("11. default paper profile", async () => {
+          localStorage.clear();
+          OB.store.load();
+          const s = OB.store.get().settings;
+          check("11. paperProfile defaults to 80mm", s.paperProfile === "80mm", String(s.paperProfile));
+          check("11. autoPrint defaults off", s.autoPrint === false, String(s.autoPrint));
+          check("11. transmissionMode defaults to standard", s.transmissionMode === "standard", String(s.transmissionMode));
+        });
+
+        // 12. legacy auto-print setting is adopted, not lost
+        await run("12. legacy autoPrint migration", async () => {
+          localStorage.clear();
+          localStorage.setItem("openbooth_receipt_settings_v1", JSON.stringify({ autoPrint: true }));
+          OB.store.load();
+          check("12. legacy autoPrint carried into openbooth_v3", OB.store.get().settings.autoPrint === true);
+          const keys = Object.keys(localStorage).filter((k) => k.indexOf("openbooth") === 0);
+          check("12. no new settings store was created", !keys.some((k) => /printer|print_settings/i.test(k)), keys.join(", "));
+        });
+
+        report();
+      })();
+    </script>
+  </body>
+</html>

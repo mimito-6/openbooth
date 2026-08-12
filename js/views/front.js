@@ -496,6 +496,9 @@
         changeGiven: isCash && cashReceived != null ? cashReceived - s.grandTotal : null,
         giftNote: s.gifts.map((g) => g.rewardText).join(", "),
       };
+      // ORDER MATTERS: the sale is committed here and is final. Everything
+      // below is presentation — a receipt or a printer problem must never
+      // roll this back, delete it, or read to the user as a failed sale.
       const savedTx = OB.store.addTransaction(tx);
       OB.store.clearCart();
       sh.close();
@@ -504,12 +507,20 @@
       toast(t("sale_done", { amount: fmtMoney(s.grandTotal) }), "success");
       printFlourish(fmtMoney(s.grandTotal));
       // ONE receipt surface, gated by the single "show receipt" setting:
-      // the receipt engine (print/share/download) when loaded, otherwise the
+      // the receipt engine (preview/share/download) when loaded, otherwise the
       // built-in thank-you card. Stacking both trapped users under two modals.
       const hasEngine = window.OB && OB.receipt && typeof OB.receipt.handle === "function";
       if (st2.settings.showReceipt) {
         if (hasEngine) setTimeout(() => OB.receipt.handle(savedTx), 320);
         else setTimeout(() => showReceipt(savedTx), 300);
+      }
+      // Auto-print is its own setting: a seller who wants silent printing
+      // should not have to also turn on the on-screen receipt. Wrapped so a
+      // throw in the print layer can never surface as a checkout error.
+      try {
+        if (OB.printFlow) OB.printFlow.afterCheckout(savedTx);
+      } catch (e) {
+        console.error("[checkout] auto-print threw; sale is unaffected", e);
       }
     }
 

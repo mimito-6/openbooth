@@ -179,6 +179,96 @@
       main.appendChild(el("div", { class: "field-hint", style: "margin-bottom:14px", text: t("receipt_hint") }));
     }
 
+    // --- printer (OpenBooth owns this; OB.printer adapts receipt-engine) ---
+    if (window.OB && OB.printer) {
+      const P = OB.printer;
+      main.appendChild(el("h2", { class: "section-title", html: OB.icon("receipt", 15) + " " + esc(t("printer_section")) }));
+
+      const cap = P.support();
+      if (!cap.usable) {
+        const why = !cap.engine ? t("print_err_no_engine") : !cap.secureContext ? t("print_err_insecure") : t("print_err_no_bluetooth");
+        main.appendChild(el("div", { class: "field-hint", style: "color:var(--warning);margin-bottom:8px", text: why }));
+      }
+
+      // live status line, driven by the adapter's state machine
+      const stateLabels = {
+        idle: t("printer_state_idle"),
+        connecting: t("printer_state_connecting"),
+        connected: t("printer_state_connected"),
+        printing: t("printer_state_printing"),
+        success: t("printer_state_success"),
+        failed: t("printer_state_failed"),
+        disconnected: t("printer_state_disconnected"),
+      };
+      const stateTone = { connected: "var(--success)", success: "var(--success)", printing: "var(--accent)", connecting: "var(--accent)", failed: "var(--danger)", disconnected: "var(--text-secondary)", idle: "var(--text-secondary)" };
+      const statusEl = el("div", { class: "field-hint", style: "margin-bottom:8px" });
+      function paintStatus(st8, err) {
+        statusEl.textContent = t("printer_status") + "：" + (stateLabels[st8] || st8) + (err && err.message ? "（" + err.message + "）" : "");
+        statusEl.style.color = stateTone[st8] || "var(--text-secondary)";
+      }
+      paintStatus(P.getState(), P.getError());
+      // settings view is rebuilt on every route change, so drop the
+      // subscription when this node leaves the document
+      const unsub = P.subscribe(paintStatus);
+      const mo = new MutationObserver(() => {
+        if (!document.body.contains(statusEl)) {
+          unsub();
+          mo.disconnect();
+        }
+      });
+      mo.observe(document.body, { childList: true, subtree: true });
+      main.appendChild(statusEl);
+
+      const prSec = el("section", { class: "settings-list" });
+      function prAction(label, fn) {
+        prSec.appendChild(el("div", { class: "settings-item", onclick: fn }, [el("span", { class: "si-label", text: label }), el("span", { class: "si-val", text: "→" })]));
+      }
+      prAction(t("printer_connect"), () => P.connect().catch(() => {}));
+      prAction(t("printer_disconnect"), () => P.disconnect());
+      prAction(t("printer_test"), () => {
+        P.testPrint().then((res) => {
+          if (res.ok) toast(t("print_sent"), "success");
+          else if (OB.printFlow) OB.printFlow.notice({ tone: "danger", title: t("printer_test_failed"), message: res.error && res.error.message, actions: [] });
+        });
+      });
+      main.appendChild(prSec);
+
+      // profile / paper / transmission — the adapter owns what these mean
+      const profSel = el("select", {}, P.profiles().map((p) => el("option", { value: p.id, text: p.label, selected: s.printerProfile === p.id ? "selected" : null })));
+      profSel.addEventListener("change", () => {
+        s.printerProfile = profSel.value;
+        // paper follows the profile so the two can never disagree
+        const chosen = P.profileById(profSel.value);
+        if (chosen && chosen.paper) s.paperProfile = chosen.paper;
+        OB.store.commit();
+        OB.router.refresh();
+      });
+      main.appendChild(OB.ui.field(t("printer_profile"), profSel));
+
+      const paperSel = el("select", {}, ["80mm", "58mm"].map((p) => el("option", { value: p, text: p, selected: s.paperProfile === p ? "selected" : null })));
+      paperSel.addEventListener("change", () => {
+        s.paperProfile = paperSel.value;
+        // keep the profile consistent with the paper the user just picked
+        const match = P.profiles().filter((p) => p.paper === paperSel.value)[0];
+        if (match) s.printerProfile = match.id;
+        OB.store.commit();
+        OB.router.refresh();
+      });
+      main.appendChild(OB.ui.field(t("paper_size"), paperSel, t("paper_hint")));
+
+      const modes = [["conservative", t("transmission_conservative")], ["standard", t("transmission_standard")], ["fast", t("transmission_fast")]];
+      const modeSel = el("select", {}, modes.map(([v, label]) => el("option", { value: v, text: label, selected: s.transmissionMode === v ? "selected" : null })));
+      modeSel.addEventListener("change", () => { s.transmissionMode = modeSel.value; OB.store.commit(); });
+      main.appendChild(OB.ui.field(t("transmission_mode"), modeSel, t("transmission_hint")));
+
+      const autoSec = el("section", { class: "section settings-list" });
+      const autoItem = el("div", { class: "settings-item" }, [el("span", { class: "si-label", text: t("auto_print") })]);
+      autoItem.appendChild(OB.ui.toggle(s.autoPrint, (on) => { s.autoPrint = on; OB.store.commit(); }));
+      autoSec.appendChild(autoItem);
+      main.appendChild(autoSec);
+      main.appendChild(el("div", { class: "field-hint", style: "margin-bottom:14px", text: t("auto_print_hint") }));
+    }
+
     // --- data backup ---
     main.appendChild(el("h2", { class: "section-title", text: t("data_backup") }));
     main.appendChild(el("div", { class: "gift-banner", style: "background:var(--accent-light);color:var(--accent-dark)", text: t("backup_reminder") }));
