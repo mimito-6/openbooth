@@ -58,8 +58,11 @@
   // Bottom sheet. Returns { root, body, footer, close }
   function sheet(opts) {
     opts = opts || {};
-    const overlay = el("div", { class: "sheet-overlay boo-transient open" });
-    const sheetEl = el("div", { class: "sheet boo-transient " + (opts.tall ? "tall" : "") });
+    // keepOnRefresh: survive a store-commit re-render (see router.cleanTransient).
+    // Use it for any sheet that saves while staying open.
+    const keep = opts.keepOnRefresh ? " boo-keep" : "";
+    const overlay = el("div", { class: "sheet-overlay boo-transient open" + keep });
+    const sheetEl = el("div", { class: "sheet boo-transient " + (opts.tall ? "tall" : "") + keep });
     const body = el("div", { class: "sheet-body" });
     const footer = el("div", { class: "sheet-footer" });
 

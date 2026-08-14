@@ -89,20 +89,62 @@
       ? JSON.parse(JSON.stringify(p))
       : { name: "", categoryId: st.categories[0] ? st.categories[0].id : null, price: 0, stockInitial: 50, bundleRules: [], image: null, sku: "" };
 
-    const sh = OB.ui.sheet({ title: isNew ? t("add_product") : t("edit_product"), tall: true });
+    // keepOnRefresh: creating a category from inside this form commits, and a
+    // commit re-renders the view — the half-filled form must survive that.
+    const sh = OB.ui.sheet({ title: isNew ? t("add_product") : t("edit_product"), tall: true, keepOnRefresh: true });
 
     const nameI = OB.ui.input({ value: data.name, placeholder: t("product_name") });
     const priceI = OB.ui.input({ type: "number", inputmode: "numeric", value: data.price });
     const stockI = OB.ui.input({ type: "number", inputmode: "numeric", value: data.stockInitial });
     const skuI = OB.ui.input({ value: data.sku || "" });
 
-    const catSel = el("select");
-    catSel.appendChild(el("option", { value: "", text: t("none") }));
-    OB.store.activeCategories().forEach((c) => {
-      const o = el("option", { value: c.id, text: c.name });
-      if (c.id === data.categoryId) o.selected = true;
-      catSel.appendChild(o);
+    // category picker + inline "new category" — previously you had to abandon
+    // this form, open the category manager from the header, then start over
+    const catSel = el("select", { style: "flex:1" });
+    function fillCats() {
+      catSel.innerHTML = "";
+      catSel.appendChild(el("option", { value: "", text: t("none") }));
+      OB.store.activeCategories().forEach((c) => {
+        const o = el("option", { value: c.id, text: c.name });
+        if (c.id === data.categoryId) o.selected = true;
+        catSel.appendChild(o);
+      });
+    }
+    fillCats();
+    catSel.addEventListener("change", () => (data.categoryId = catSel.value || null));
+
+    const newCatRow = el("div", { style: "display:none;gap:6px;margin-top:8px" });
+    const newCatI = OB.ui.input({ placeholder: t("category_name"), style: "flex:1" });
+    function createCat() {
+      const made = addCategory(newCatI.value);
+      if (!made) return;
+      data.categoryId = made.id; // select what was just created
+      newCatI.value = "";
+      newCatRow.style.display = "none";
+      fillCats();
+    }
+    newCatI.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        createCat();
+      }
     });
+    newCatRow.appendChild(newCatI);
+    newCatRow.appendChild(el("button", { class: "btn btn-primary btn-sm", text: t("add"), onclick: createCat }));
+    newCatRow.appendChild(el("button", { class: "btn btn-secondary btn-sm", text: t("cancel"), onclick: () => { newCatRow.style.display = "none"; newCatI.value = ""; } }));
+
+    const catRow = el("div", { style: "display:flex;gap:6px;align-items:center" }, [
+      catSel,
+      el("button", {
+        class: "mini-btn",
+        text: "＋ " + t("new_category"),
+        onclick: () => {
+          newCatRow.style.display = "flex";
+          setTimeout(() => newCatI.focus(), 0);
+        },
+      }),
+    ]);
+    const catField = el("div", {}, [catRow, newCatRow]);
 
     // image
     const imgPreview = el("div", { style: "display:flex;gap:10px;align-items:center" });
@@ -151,7 +193,7 @@
 
     sh.body.appendChild(OB.ui.field(t("product_name"), nameI));
     sh.body.appendChild(el("div", { class: "field-row" }, [OB.ui.field(t("price"), priceI), OB.ui.field(t("stock_initial"), stockI)]));
-    sh.body.appendChild(OB.ui.field(t("category"), catSel));
+    sh.body.appendChild(OB.ui.field(t("category"), catField));
     sh.body.appendChild(OB.ui.field(t("image"), imgPreview));
     sh.body.appendChild(OB.ui.field(t("bundle_rules"), bundleWrap, t("bundle_hint_example")));
     sh.body.appendChild(OB.ui.field(t("sku"), skuI));
@@ -263,15 +305,39 @@
   }
 
   // ---------- category manager ----------
+  // Common booth categories offered as one-tap chips. Suggestions only —
+  // nothing is created until the seller taps one.
+  const SUGGESTED_CATEGORIES = ["cat_sug_acrylic", "cat_sug_sticker", "cat_sug_postcard", "cat_sug_badge", "cat_sug_charm", "cat_sug_book", "cat_sug_print", "cat_sug_apparel", "cat_sug_stationery", "cat_sug_bag"];
+
+  function addCategory(name) {
+    const clean = (name || "").trim();
+    if (!clean) return null;
+    const dupe = OB.store.get().categories.find((c) => c.name.trim() === clean);
+    if (dupe) {
+      toast(t("category_exists"), "danger");
+      return null;
+    }
+    return OB.store.upsertCategory({ name: clean, color: "#c46b43" });
+  }
+
   function openCategories() {
-    const st = OB.store.get();
-    const sh = OB.ui.sheet({ title: t("manage_categories") });
+    // keepOnRefresh: adding a category commits, which re-renders the view —
+    // without this the sheet would be torn down on the first tap.
+    const sh = OB.ui.sheet({ title: t("manage_categories"), keepOnRefresh: true });
     function renderList() {
+      const st = OB.store.get();
       sh.body.innerHTML = "";
+
+      // existing categories — rename in place, delete with ×
       st.categories.forEach((c) => {
         const nameI = OB.ui.input({ value: c.name });
         nameI.addEventListener("change", () => {
-          c.name = nameI.value.trim();
+          const v = nameI.value.trim();
+          if (!v) {
+            nameI.value = c.name;
+            return;
+          }
+          c.name = v;
           OB.store.upsertCategory(c);
         });
         sh.body.appendChild(
@@ -281,12 +347,53 @@
           ])
         );
       });
+      if (!st.categories.length) {
+        sh.body.appendChild(el("div", { class: "field-hint", style: "margin-bottom:10px", text: t("no_categories_yet") }));
+      }
+
+      // name it, THEN create it — the old flow made a placeholder called
+      // "new category" and left you to rename it afterwards
+      const newI = OB.ui.input({ placeholder: t("category_name") });
+      function commitNew() {
+        if (!newI.value.trim()) return;
+        if (addCategory(newI.value)) {
+          newI.value = "";
+          renderList();
+          setTimeout(() => newI.focus(), 0);
+        }
+      }
+      newI.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          commitNew();
+        }
+      });
       sh.body.appendChild(
-        el("button", { class: "btn btn-primary btn-block btn-sm", text: "＋ " + t("category_name"), onclick: () => { OB.store.upsertCategory({ name: t("new_category"), color: "#c46b43" }); renderList(); } })
+        el("div", { class: "field-row", style: "align-items:center;margin:10px 0 4px" }, [
+          newI,
+          el("button", { class: "btn btn-primary btn-sm", text: t("add"), onclick: commitNew }),
+        ])
       );
+
+      // one-tap suggestions for whatever the seller has not added yet
+      const taken = st.categories.map((c) => c.name.trim());
+      const remaining = SUGGESTED_CATEGORIES.map((k) => t(k)).filter((n) => taken.indexOf(n) < 0);
+      if (remaining.length) {
+        sh.body.appendChild(el("div", { class: "field-hint", style: "margin-top:12px", text: t("category_suggestions") }));
+        const chips = el("div", { style: "display:flex;flex-wrap:wrap;gap:6px;margin-top:6px" });
+        remaining.forEach((n) => {
+          chips.appendChild(
+            el("button", { class: "mini-btn", text: "＋ " + n, onclick: () => { addCategory(n); renderList(); } })
+          );
+        });
+        sh.body.appendChild(chips);
+      }
     }
     renderList();
   }
+
+  OB.app = OB.app || {};
+  OB.app.openCategories = openCategories;
 
   OB.router.register("stock", render);
 })();

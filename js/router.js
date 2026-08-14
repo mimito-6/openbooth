@@ -15,16 +15,23 @@
     routes[name] = fn;
   }
 
-  function cleanTransient() {
-    document.querySelectorAll(".boo-transient").forEach((n) => n.remove());
+  // Navigating away closes every transient node. A same-view refresh is
+  // different: it fires whenever the store commits, and a sheet the user is
+  // still working in must not disappear just because it saved its own data.
+  // Such sheets opt out with .boo-keep (OB.ui.sheet({ keepOnRefresh: true })).
+  function cleanTransient(keepMarked) {
+    const sel = keepMarked ? ".boo-transient:not(.boo-keep)" : ".boo-transient";
+    document.querySelectorAll(sel).forEach((n) => n.remove());
   }
 
-  function render() {
+  function render(opts) {
     const root = document.getElementById("app");
     if (!root) return;
-    cleanTransient();
+    cleanTransient(!!(opts && opts.keepMarked));
     root.innerHTML = "";
     if (window.OB.store && OB.store.isLocked && OB.store.isLocked() && currentName !== "front" && currentName !== "home") {
+      // locking hides revenue — no sheet may survive on top of the lock screen
+      cleanTransient(false);
       renderLocked(root);
       window.scrollTo(0, 0);
       return;
@@ -59,7 +66,7 @@
   }
 
   function refresh() {
-    if (currentName) render();
+    if (currentName) render({ keepMarked: true });
   }
   function current() {
     return currentName;
