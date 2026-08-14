@@ -36,6 +36,9 @@
       main.appendChild(OB.ui.emptyState("box", t("no_products")));
     } else {
       const listSec = el("section", { class: "section" }, [el("h2", { class: "section-title", text: t("nav_stock") })]);
+      if (prods.length > 1) {
+        listSec.appendChild(el("div", { class: "field-hint", style: "margin:-2px 0 8px", text: t("order_hint") }));
+      }
       prods.forEach((p) => listSec.appendChild(productRow(p)));
       main.appendChild(listSec);
     }
@@ -45,13 +48,35 @@
       const combos = OB.store.activeCombos();
       if (combos.length) {
         const cs = el("section", { class: "section" }, [el("h2", { class: "section-title", text: t("combos") })]);
-        combos.forEach((c) => cs.appendChild(comboRow(c)));
+        combos.forEach((c, i) => cs.appendChild(comboRow(c, i, combos.length)));
         main.appendChild(cs);
       }
     }
 
     view.appendChild(main);
     root.appendChild(view);
+
+    /* Up/down controls. The row itself opens the editor, so these must not let
+       the click through. Order here IS the order the front grid sells in. */
+    function moveCol(idx, total, move) {
+      const btn = (dir, glyph, label) => {
+        const disabled = dir < 0 ? idx === 0 : idx === total - 1;
+        return el("button", {
+          class: "move-btn",
+          html: glyph,
+          "aria-label": label,
+          disabled: disabled ? "true" : null,
+          onclick: (e) => {
+            e.stopPropagation();
+            move(dir);
+          },
+        });
+      };
+      return el("div", { class: "move-col" }, [
+        btn(-1, OB.icon("chevron-up", 16), t("move_up")),
+        btn(1, OB.icon("chevron-down", 16), t("move_down")),
+      ]);
+    }
 
     function productRow(p) {
       const rem = OB.inventory.committedRemaining(st, p.id);
@@ -65,10 +90,11 @@
         thumb,
         el("div", { class: "list-main" }, [el("div", { class: "list-title", text: p.name }), el("div", { class: "list-sub", text: sub })]),
         el("div", { class: "list-end" }, [el("div", { class: "list-amount", text: fmtMoney(p.price) })]),
+        moveCol(prods.indexOf(p), prods.length, (dir) => OB.store.moveProduct(p.id, dir)),
       ]);
     }
 
-    function comboRow(c) {
+    function comboRow(c, idx, total) {
       const parts = (c.uses || []).map((u) => {
         const p = OB.store.product(u.productId);
         return (p ? p.name : "?") + "×" + u.qty;
@@ -77,6 +103,7 @@
         el("div", { class: "list-thumb", html: OB.icon("gift", 22) }),
         el("div", { class: "list-main" }, [el("div", { class: "list-title", text: c.name }), el("div", { class: "list-sub", text: parts.join(" + ") })]),
         el("div", { class: "list-end" }, [el("div", { class: "list-amount", text: fmtMoney(c.price) })]),
+        moveCol(idx, total, (dir) => OB.store.moveCombo(c.id, dir)),
       ]);
     }
   }

@@ -231,6 +231,30 @@
     commit();
   }
 
+  /* Move an item one slot within its ACTIVE list. This is the order the front
+     grid renders in, so it is the seller's shelf layout.
+     sortOrder in stored data can have gaps and duplicates (new items take
+     list.length, deletions leave holes), so rather than swapping two values we
+     rewrite the whole active list to 0..n-1 — the order heals itself on any
+     move. dir is -1 (up) or +1 (down). Returns false at the ends. */
+  function moveInOrder(list, id, dir) {
+    const i = list.findIndex((x) => x.id === id);
+    const j = i + dir;
+    if (i < 0 || j < 0 || j >= list.length) return false;
+    const next = list.slice();
+    const [moved] = next.splice(i, 1);
+    next.splice(j, 0, moved);
+    next.forEach((x, idx) => (x.sortOrder = idx));
+    commit();
+    return true;
+  }
+  function moveProduct(id, dir) {
+    return moveInOrder(activeProducts(), id, dir);
+  }
+  function moveCombo(id, dir) {
+    return moveInOrder(activeCombos(), id, dir);
+  }
+
   // ---------- CRUD: combos ----------
   function upsertCombo(c) {
     if (!c.id) {
@@ -566,8 +590,10 @@
     activeCategories,
     upsertProduct,
     deleteProduct,
+    moveProduct,
     upsertCombo,
     deleteCombo,
+    moveCombo,
     upsertCategory,
     deleteCategory,
     upsertEvent,

@@ -27,7 +27,11 @@
   function render(opts) {
     const root = document.getElementById("app");
     if (!root) return;
-    cleanTransient(!!(opts && opts.keepMarked));
+    // Navigating starts at the top; a same-view refresh must not yank the page
+    // back — reordering a product halfway down the list commits on every tap.
+    const sameView = !!(opts && opts.keepMarked);
+    const keepY = sameView ? window.scrollY : 0;
+    cleanTransient(sameView);
     root.innerHTML = "";
     if (window.OB.store && OB.store.isLocked && OB.store.isLocked() && currentName !== "front" && currentName !== "home") {
       // locking hides revenue — no sheet may survive on top of the lock screen
@@ -38,7 +42,7 @@
     }
     const fn = routes[currentName] || routes["home"];
     fn(root, currentParams);
-    window.scrollTo(0, 0);
+    window.scrollTo(0, keepY);
     // reflect in hash for share/deep-link friendliness (no reload)
     try {
       const h = "#/" + currentName;
