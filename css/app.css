@@ -484,9 +484,38 @@ main {
   opacity: 0.4;
   pointer-events: none;
 }
+/* Selling the last unit marks the tile sold-out — but those units are sitting
+   in the cart, so it must stay reachable or there is no way to swipe one back. */
+.item-card.sold-out.has-qty {
+  pointer-events: auto;
+}
+
+/* ---- swipe-left-to-remove ----
+   pan-y keeps vertical scrolling with the browser; horizontal is ours. */
+.item-card {
+  touch-action: pan-y;
+}
+.item-card.swiping {
+  transition: none;
+}
+.swipe-hint {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  font-weight: 800;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--danger);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+}
 .item-thumb {
   width: 100%;
-  aspect-ratio: 1.2 / 1;
+  /* square: product images are cropped to 1:1 in the editor, so the tile
+     shows exactly the frame the seller chose */
+  aspect-ratio: 1 / 1;
   object-fit: cover;
   border-radius: var(--r-sm);
   margin-bottom: 8px;

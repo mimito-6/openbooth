@@ -146,23 +146,39 @@
     ]);
     const catField = el("div", {}, [catRow, newCatRow]);
 
-    // image
-    const imgPreview = el("div", { style: "display:flex;gap:10px;align-items:center" });
+    // image — always stored square, framed by the seller rather than by
+    // whatever object-fit:cover happened to keep
+    const imgPreview = el("div", { style: "display:flex;gap:10px;align-items:center;flex-wrap:wrap" });
     function renderImg() {
       imgPreview.innerHTML = "";
       if (data.image) imgPreview.appendChild(el("img", { src: data.image, style: "width:64px;height:64px;border-radius:10px;object-fit:cover" }));
       imgPreview.appendChild(el("button", { class: "mini-btn", text: t("pick_image"), onclick: pickImg }));
-      if (data.image) imgPreview.appendChild(el("button", { class: "mini-btn", text: t("remove_image"), onclick: () => { data.image = null; renderImg(); } }));
+      if (data.image) {
+        imgPreview.appendChild(el("button", { class: "mini-btn", text: t("adjust_crop"), onclick: recrop }));
+        imgPreview.appendChild(el("button", { class: "mini-btn", text: t("remove_image"), onclick: () => { data.image = null; renderImg(); } }));
+      }
     }
     async function pickImg() {
       const f = await U.pickFile("image/*");
       if (!f) return;
       try {
-        data.image = await U.fileToScaledDataURL(f, 360, 0.8);
+        // downscale first so the cropper works on a sane bitmap, then let the
+        // seller choose the square before anything is stored
+        const working = await U.fileToScaledDataURL(f, 1200, 0.92);
+        const cropped = await OB.ui.cropImage(working);
+        if (!cropped) return; // cancelled — keep whatever was there before
+        data.image = cropped;
         renderImg();
       } catch (e) {
         toast(t("image_failed"), "danger");
       }
+    }
+    async function recrop() {
+      if (!data.image) return;
+      const cropped = await OB.ui.cropImage(data.image);
+      if (!cropped) return;
+      data.image = cropped;
+      renderImg();
     }
     renderImg();
 

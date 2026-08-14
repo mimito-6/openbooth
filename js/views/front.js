@@ -98,8 +98,9 @@
       const bundle = (p.bundleRules && p.bundleRules[0]) ? p.bundleRules[0].label || p.bundleRules[0].qty + "→" + p.bundleRules[0].price : "";
       const card = el("div", {
         class: "item-card" + (inCart ? " has-qty" : "") + (soldOut ? " sold-out" : ""),
-        onclick: () => addProduct(p.id),
       });
+      tapAdd(card, () => addProduct(p.id));
+      if (inCart) attachSwipe(card, () => removeOne("product", p.id));
       if (inCart) card.appendChild(el("span", { class: "qty-badge", text: inCart }));
       if (p.image) card.appendChild(el("img", { class: "item-thumb", src: p.image, alt: "" }));
       card.appendChild(el("div", { class: "item-name", text: p.name }));
@@ -120,8 +121,9 @@
       const canSell = OB.inventory.canAddCombo(st, cart, c.id);
       const card = el("div", {
         class: "item-card combo" + (inCart ? " has-qty" : "") + (!canSell && !inCart ? " sold-out" : ""),
-        onclick: () => addCombo(c.id),
       });
+      tapAdd(card, () => addCombo(c.id));
+      if (inCart) attachSwipe(card, () => removeOne("combo", c.id));
       if (inCart) card.appendChild(el("span", { class: "qty-badge", text: inCart }));
       const nameLine = el("div", { class: "item-name" });
       nameLine.appendChild(el("span", { class: "combo-letter", text: t("combo_badge") }));
@@ -130,6 +132,89 @@
       card.appendChild(el("div", { class: "combo-desc", text: c.description || "" }));
       card.appendChild(el("div", { class: "item-bottom" }, [el("div", { class: "item-price", html: esc(fmtMoney(c.price)) })]));
       return card;
+    }
+
+    /* Swipe left on a tile to take one back off the cart.
+       Tapping adds; until now the only way to remove was to open the detail
+       sheet, which is a lot of taps when a customer changes their mind mid-sale.
+       Vertical movement is left alone so the grid still scrolls, and the tap
+       handler is suppressed once a gesture has been claimed as a swipe. */
+    const SWIPE_TRIGGER = 56; // px before it counts as a remove
+    function attachSwipe(card, onRemove) {
+      let startX = 0;
+      let startY = 0;
+      let dx = 0;
+      let axis = null; // null = undecided, "x" = ours, "y" = the page scrolls
+      let active = false;
+
+      const hint = el("div", { class: "swipe-hint", text: "−1" });
+      card.appendChild(hint);
+
+      function reset(animate) {
+        card.classList.toggle("swiping", !animate);
+        card.style.transform = "";
+        hint.style.opacity = "";
+        axis = null;
+        active = false;
+        dx = 0;
+      }
+
+      card.addEventListener("pointerdown", (e) => {
+        if (e.pointerType === "mouse" && e.button !== 0) return;
+        active = true;
+        axis = null;
+        startX = e.clientX;
+        startY = e.clientY;
+        card.classList.add("swiping");
+      });
+
+      card.addEventListener("pointermove", (e) => {
+        if (!active) return;
+        const mx = e.clientX - startX;
+        const my = e.clientY - startY;
+        if (!axis) {
+          if (Math.abs(mx) < 8 && Math.abs(my) < 8) return;
+          // a mostly-horizontal, leftward move is ours; anything else scrolls
+          axis = Math.abs(mx) > Math.abs(my) && mx < 0 ? "x" : "y";
+          if (axis === "x") {
+            // capture is an optimisation, not a requirement — never let it
+            // throw out of the handler and abort the gesture
+            try {
+              card.setPointerCapture(e.pointerId);
+            } catch (err) {}
+          }
+        }
+        if (axis !== "x") return;
+        e.preventDefault();
+        dx = Math.max(-96, Math.min(0, mx));
+        card.style.transform = "translateX(" + dx + "px)";
+        hint.style.opacity = String(Math.min(1, Math.abs(dx) / SWIPE_TRIGGER));
+      });
+
+      function finish(e) {
+        if (!active) return;
+        const fired = axis === "x" && dx <= -SWIPE_TRIGGER;
+        try {
+          card.releasePointerCapture(e.pointerId);
+        } catch (err) {}
+        if (fired) {
+          card.__swiped = true; // swallow the click this gesture produces
+          setTimeout(() => (card.__swiped = false), 350);
+          reset(true);
+          onRemove();
+          return;
+        }
+        reset(true);
+      }
+      card.addEventListener("pointerup", finish);
+      card.addEventListener("pointercancel", finish);
+    }
+
+    function tapAdd(card, fn) {
+      card.addEventListener("click", () => {
+        if (card.__swiped) return;
+        fn();
+      });
     }
 
     function updateGrid() {
@@ -191,6 +276,16 @@
       else cart.lines.push({ uid: uuid(), kind: "product", refId: id, qty: 1, isTokuten: false, manualUnitPrice: null });
       OB.store.setCart(cart);
       updateGrid();
+      hintSwipeOnce();
+    }
+    // A gesture nobody is told about is a gesture nobody uses. Mention it the
+    // first time something lands in the cart, once per device.
+    function hintSwipeOnce() {
+      try {
+        if (localStorage.getItem("openbooth_swipe_hint_v1")) return;
+        localStorage.setItem("openbooth_swipe_hint_v1", "1");
+        setTimeout(() => toast(t("swipe_to_remove")), 700);
+      } catch (e) {}
     }
     function addCombo(id) {
       const cart = OB.store.getCart();
@@ -201,6 +296,25 @@
       let line = cart.lines.find((l) => l.kind === "combo" && l.refId === id && !l.isTokuten && l.manualUnitPrice == null);
       if (line) line.qty++;
       else cart.lines.push({ uid: uuid(), kind: "combo", refId: id, qty: 1, isTokuten: false, manualUnitPrice: null });
+      OB.store.setCart(cart);
+      updateGrid();
+      hintSwipeOnce();
+    }
+
+    /* Take one unit back off the cart.
+       The badge on a tile is the SUM of every line for that item, so prefer
+       the plain line (the one tapping creates). Only if there is none — the
+       item is in the cart solely as a 特典 / manually-priced line — fall back
+       to the most recent matching line, so the swipe always does what the
+       badge implies. Detailed surgery still belongs in the detail sheet. */
+    function removeOne(kind, id) {
+      const cart = OB.store.getCart();
+      const matches = cart.lines.filter((l) => l.kind === kind && l.refId === id);
+      if (!matches.length) return;
+      const line =
+        matches.find((l) => !l.isTokuten && l.manualUnitPrice == null) || matches[matches.length - 1];
+      line.qty--;
+      if (line.qty <= 0) cart.lines = cart.lines.filter((l) => l.uid !== line.uid);
       OB.store.setCart(cart);
       updateGrid();
     }
