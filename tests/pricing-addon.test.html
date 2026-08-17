@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <title>OpenBooth — add-on pricing tests</title>
+    <style>
+      body { font: 14px/1.6 system-ui, "PingFang TC", sans-serif; margin: 24px; max-width: 900px; }
+      h1 { font-size: 18px; }
+      #out { border: 1px solid #ddd; border-radius: 8px; padding: 12px; }
+      .t { padding: 6px 0; border-bottom: 1px solid #f0f0f0; display: flex; gap: 10px; }
+      .t:last-child { border-bottom: none; }
+      .badge { font-weight: 700; min-width: 52px; }
+      .pass .badge { color: #1a7f4b; }
+      .fail .badge { color: #c02626; }
+      .why { color: #666; }
+      #sum { margin-top: 14px; font-weight: 700; }
+    </style>
+  </head>
+  <body>
+    <h1>Add-on pricing — "buy anything else, this one is cheaper"</h1>
+    <div id="out"></div>
+    <div id="sum"></div>
+
+    <script src="../js/i18n.js"></script>
+    <script src="../js/util.js"></script>
+    <script src="../js/pricing.js"></script>
+
+    <script>
+      const results = [];
+      function check(name, cond, why) { results.push({ name, ok: !!cond, why: why || "" }); }
+      function eq(name, got, want) { check(name, got === want, "got " + got + ", want " + want); }
+
+      /* ---- fixtures ----
+         MAIN 400 (a normal product)
+         CARD 200 base, add-on 100, no cap
+         CAP  200 base, add-on 100, max 1 per sale
+         TIER 200 base with a 3-for-500 bundle AND an add-on price of 100 */
+      const state = {
+        products: [
+          { id: "main", name: "壓克力立牌", price: 400 },
+          { id: "card", name: "明信片套組", price: 200, addonPrice: 100, addonMax: 0 },
+          { id: "cap", name: "限量明信片", price: 200, addonPrice: 100, addonMax: 1 },
+          { id: "tier", name: "階梯明信片", price: 200, addonPrice: 100, addonMax: 2, bundleRules: [{ qty: 3, price: 500, label: "3→500" }] },
+        ],
+        combos: [{ id: "set", name: "同人誌套組", price: 1200 }],
+        giftThresholds: [],
+      };
+      let uid = 0;
+      const line = (refId, qty, extra) => Object.assign({ uid: "u" + ++uid, kind: refId === "set" ? "combo" : "product", refId, qty, isTokuten: false, manualUnitPrice: null }, extra || {});
+      const cart = (...lines) => ({ lines, discount: 0 });
+      const calc = (...lines) => OB.pricing.calcSale(state, cart(...lines));
+      const lineFor = (sale, refId) => sale.lines.find((l) => l.refId === refId);
+
+      // 1. add-on alone does NOT discount itself
+      (() => {
+        const s = calc(line("card", 1));
+        eq("1. card alone stays at full price", s.grandTotal, 200);
+        eq("1. no add-on units counted", lineFor(s, "card").addonQty, 0);
+      })();
+
+      // 2. add-on alone, several of them, still full price
+      (() => {
+        const s = calc(line("card", 3));
+        eq("2. three cards alone = 600", s.grandTotal, 600);
+      })();
+
+      // 3. with a main item the add-on price applies
+      (() => {
+        const s = calc(line("main", 1), line("card", 1));
+        eq("3. main + card = 400 + 100", s.grandTotal, 500);
+        eq("3. one add-on unit counted", lineFor(s, "card").addonQty, 1);
+      })();
+
+      // 4. uncapped: every unit gets the add-on price
+      (() => {
+        const s = calc(line("main", 1), line("card", 3));
+        eq("4. main + 3 cards = 400 + 300", s.grandTotal, 700);
+        eq("4. three add-on units", lineFor(s, "card").addonQty, 3);
+      })();
+
+      // 5. a combo counts as a main purchase
+      (() => {
+        const s = calc(line("set", 1), line("card", 1));
+        eq("5. combo + card = 1200 + 100", s.grandTotal, 1300);
+      })();
+
+      // 6. two different add-ons and nothing else: neither qualifies
+      (() => {
+        const s = calc(line("card", 1), line("cap", 1));
+        eq("6. add-ons cannot unlock each other", s.grandTotal, 400);
+      })();
+
+      // 7. per-sale cap
+      (() => {
+        const s = calc(line("main", 1), line("cap", 3));
+        eq("7. only 1 discounted, rest full price", s.grandTotal, 400 + 100 + 200 + 200);
+        eq("7. cap respected", lineFor(s, "cap").addonQty, 1);
+      })();
+
+      // 8. the cap is per sale, not per line
+      (() => {
+        const s = calc(line("main", 1), line("cap", 1), line("cap", 1));
+        eq("8. two separate lines still share one allowance", s.grandTotal, 400 + 100 + 200);
+      })();
+
+      // 9. leftovers past the cap still get bundle tiers
+      (() => {
+        // 4 tier items, 2 at add-on price, 2 left → no full 3-tier, so 2×200
+        const s = calc(line("main", 1), line("tier", 4));
+        eq("9. add-on then bundle for the rest", s.grandTotal, 400 + 200 + 400);
+      })();
+
+      // 10. a manual price always wins over the add-on price
+      (() => {
+        const s = calc(line("main", 1), line("card", 1, { manualUnitPrice: 50 }));
+        eq("10. manual override wins", s.grandTotal, 450);
+        eq("10. not counted as add-on", lineFor(s, "card").addonQty, 0);
+      })();
+
+      // 11. tokuten (free) still free
+      (() => {
+        const s = calc(line("main", 1), line("card", 1, { isTokuten: true }));
+        eq("11. tokuten stays free", s.grandTotal, 400);
+      })();
+
+      // 12. removing the main item re-prices the add-on back to full
+      (() => {
+        const withMain = calc(line("main", 1), line("card", 2));
+        const without = calc(line("card", 2));
+        eq("12. with main", withMain.grandTotal, 600);
+        eq("12. main removed → full price again", without.grandTotal, 400);
+      })();
+
+      // 13. savings are reported so the receipt can show them
+      (() => {
+        const s = calc(line("main", 1), line("card", 2));
+        eq("13. bundleSaved reflects the add-on discount", s.bundleSaved, 200);
+        eq("13. originalTotal is undiscounted", s.originalTotal, 800);
+      })();
+
+      // 14. a product with no addonPrice is untouched
+      (() => {
+        const s = calc(line("main", 2));
+        eq("14. plain product unaffected", s.grandTotal, 800);
+        check("14. isAddon false for plain product", OB.pricing.isAddon(state.products[0]) === false);
+      })();
+
+      // 15. addonPrice of 0 is valid (free with any purchase)
+      (() => {
+        const freebie = { id: "free", name: "小卡", price: 50, addonPrice: 0, addonMax: 1 };
+        const st2 = Object.assign({}, state, { products: state.products.concat([freebie]) });
+        const s = OB.pricing.calcSale(st2, cart(line("main", 1), line("free", 2)));
+        eq("15. one free, one full price", s.grandTotal, 400 + 0 + 50);
+      })();
+
+      const out = document.getElementById("out");
+      results.forEach((r) => {
+        const d = document.createElement("div");
+        d.className = "t " + (r.ok ? "pass" : "fail");
+        d.innerHTML = '<span class="badge">' + (r.ok ? "PASS" : "FAIL") + "</span><span>" + r.name + (r.ok ? "" : ' <span class="why">— ' + r.why + "</span>") + "</span>";
+        out.appendChild(d);
+      });
+      const bad = results.filter((r) => !r.ok).length;
+      document.getElementById("sum").textContent = results.length - bad + " / " + results.length + " passed" + (bad ? " — " + bad + " FAILED" : "");
+      document.title = (bad ? "FAIL " : "PASS ") + document.title;
+      window.__RESULTS__ = { total: results.length, failed: bad, results };
+    </script>
+  </body>
+</html>

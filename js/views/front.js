@@ -95,7 +95,14 @@
       const remAfter = rem - inCart;
       const low = isFinite(rem) && remAfter <= st.settings.lowStockThreshold && remAfter > 0;
       const soldOut = isFinite(rem) && remAfter <= 0;
-      const bundle = (p.bundleRules && p.bundleRules[0]) ? p.bundleRules[0].label || p.bundleRules[0].qty + "→" + p.bundleRules[0].price : "";
+      // Add-on tiles say so on the tile, and say whether the price is live
+      // right now — the rule depends on the rest of the cart, so a seller
+      // cannot work it out by looking at this product alone.
+      const addon = OB.pricing.isAddon(p);
+      const addonLive = addon && OB.pricing.cartQualifiesForAddon(st, cart);
+      const bundle = addon
+        ? (addonLive ? "＋" + fmtMoney(p.addonPrice) : t("addon_needs_main"))
+        : (p.bundleRules && p.bundleRules[0]) ? p.bundleRules[0].label || p.bundleRules[0].qty + "→" + p.bundleRules[0].price : "";
       const card = el("div", {
         class: "item-card" + (inCart ? " has-qty" : "") + (soldOut ? " sold-out" : ""),
       });
@@ -104,7 +111,11 @@
       if (inCart) card.appendChild(el("span", { class: "qty-badge", text: inCart }));
       if (p.image) card.appendChild(el("img", { class: "item-thumb", src: p.image, alt: "" }));
       card.appendChild(el("div", { class: "item-name", text: p.name }));
-      card.appendChild(bundle ? el("div", { class: "item-bundle", text: bundle }) : el("div", { class: "item-bundle" }));
+      card.appendChild(
+        bundle
+          ? el("div", { class: "item-bundle" + (addon ? (addonLive ? " addon-live" : " addon-idle") : ""), text: bundle })
+          : el("div", { class: "item-bundle" })
+      );
       const bottom = el("div", { class: "item-bottom" }, [
         el("div", { class: "item-price", html: esc(fmtMoney(p.price)) }),
       ]);

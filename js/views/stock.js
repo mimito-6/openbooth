@@ -85,7 +85,9 @@
       const thumb = p.image
         ? el("img", { class: "list-thumb", src: p.image, alt: "" })
         : el("div", { class: "list-thumb", html: OB.icon("tag", 22) });
-      const sub = (cat ? cat.name + " · " : "") + t("stock_label") + " " + (isFinite(rem) ? Math.max(0, rem) : "∞") + " · " + t("sold_label") + " " + sold;
+      const sub =
+        (OB.pricing.isAddon(p) ? t("addon_badge") + " " + fmtMoney(p.addonPrice) + " · " : "") +
+        (cat ? cat.name + " · " : "") + t("stock_label") + " " + (isFinite(rem) ? Math.max(0, rem) : "∞") + " · " + t("sold_label") + " " + sold;
       return el("div", { class: "list-row", onclick: () => editProduct(p) }, [
         thumb,
         el("div", { class: "list-main" }, [el("div", { class: "list-title", text: p.name }), el("div", { class: "list-sub", text: sub })]),
@@ -114,7 +116,7 @@
     const isNew = !p;
     const data = p
       ? JSON.parse(JSON.stringify(p))
-      : { name: "", categoryId: st.categories[0] ? st.categories[0].id : null, price: 0, stockInitial: 50, bundleRules: [], image: null, sku: "" };
+      : { name: "", categoryId: st.categories[0] ? st.categories[0].id : null, price: 0, stockInitial: 50, bundleRules: [], image: null, sku: "", addonPrice: null, addonMax: 0 };
 
     // keepOnRefresh: creating a category from inside this form commits, and a
     // commit re-renders the view — the half-filled form must survive that.
@@ -239,6 +241,36 @@
     sh.body.appendChild(OB.ui.field(t("category"), catField));
     sh.body.appendChild(OB.ui.field(t("image"), imgPreview));
     sh.body.appendChild(OB.ui.field(t("bundle_rules"), bundleWrap, t("bundle_hint_example")));
+
+    /* Add-on pricing: a cheaper price that only applies when the customer is
+       already buying something else. A combo cannot express this — it would
+       need one entry per pairing — and bundle tiers only count the same item. */
+    const addonWrap = el("div");
+    const addonPriceI = OB.ui.input({ type: "number", inputmode: "numeric", value: data.addonPrice != null ? data.addonPrice : "", placeholder: t("addon_price_placeholder") });
+    const addonMaxI = OB.ui.input({ type: "number", inputmode: "numeric", value: data.addonMax || "", placeholder: t("addon_max_placeholder") });
+    const addonRow = el("div", { class: "field-row", style: "align-items:flex-end" }, [
+      el("div", { class: "field", style: "flex:1" }, [el("label", { text: t("addon_price") }), addonPriceI]),
+      el("div", { class: "field", style: "flex:1" }, [el("label", { text: t("addon_max") }), addonMaxI]),
+    ]);
+    addonWrap.appendChild(addonRow);
+    const addonState = el("div", { class: "field-hint" });
+    function paintAddonState() {
+      const v = addonPriceI.value.trim();
+      if (v === "") {
+        addonState.textContent = t("addon_off");
+        addonState.style.color = "var(--text-muted)";
+      } else {
+        const cap = Math.max(0, Math.round(Number(addonMaxI.value)) || 0);
+        addonState.textContent = t("addon_on", { price: OB.util.fmtMoney(Math.max(0, Math.round(Number(v)) || 0)) }) + (cap > 0 ? " · " + t("addon_max_note", { n: cap }) : "");
+        addonState.style.color = "var(--success)";
+      }
+    }
+    addonPriceI.addEventListener("input", paintAddonState);
+    addonMaxI.addEventListener("input", paintAddonState);
+    paintAddonState();
+    addonWrap.appendChild(addonState);
+    sh.body.appendChild(OB.ui.field(t("addon_section"), addonWrap, t("addon_hint")));
+
     sh.body.appendChild(OB.ui.field(t("sku"), skuI));
 
     const saveBtn = el("button", { class: "btn btn-primary", text: t("save"), onclick: save });
@@ -260,6 +292,10 @@
       data.categoryId = catSel.value || null;
       data.sku = skuI.value.trim();
       data.bundleRules = (data.bundleRules || []).filter((b) => b.qty > 0 && b.price >= 0);
+      // blank price = not an add-on at all; null keeps isAddon() false
+      const ap = addonPriceI.value.trim();
+      data.addonPrice = ap === "" ? null : Math.max(0, Math.round(Number(ap)) || 0);
+      data.addonMax = Math.max(0, Math.round(Number(addonMaxI.value)) || 0);
       OB.store.upsertProduct(data);
       sh.close();
       toast(t("save") + " ✓", "success");

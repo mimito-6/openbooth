@@ -1063,6 +1063,15 @@ main {
 .list-row:last-child {
   border-bottom: none;
 }
+/* add-on pricing state on a selling tile: live vs waiting for a main item */
+.item-bundle.addon-live {
+  color: var(--success);
+  font-weight: 700;
+}
+.item-bundle.addon-idle {
+  color: var(--text-muted);
+}
+
 /* reorder controls on stock rows — this order is the front grid's order */
 .move-col {
   display: flex;
