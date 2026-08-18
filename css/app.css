@@ -457,13 +457,13 @@ main {
 .item-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+  gap: 12px;
 }
 .item-card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
-  padding: 12px;
+  padding: 12px 12px 14px;
   position: relative;
   transition: transform 0.1s, border-color 0.15s, background 0.15s;
   display: flex;
@@ -518,14 +518,14 @@ main {
   aspect-ratio: 1 / 1;
   object-fit: cover;
   border-radius: var(--r-sm);
-  margin-bottom: 8px;
+  margin-bottom: 12px;
   background: var(--surface-2);
 }
 .item-name {
   font-size: 14px;
   font-weight: 700;
-  line-height: 1.3;
-  margin-bottom: 4px;
+  line-height: 1.35;
+  margin-bottom: 6px;
 }
 .item-bundle {
   font-size: 11px;
@@ -537,7 +537,8 @@ main {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  margin-top: 8px;
+  gap: 8px; /* price and stock count were touching on narrow tiles */
+  margin-top: 12px;
 }
 .item-price {
   font-size: 18px;
@@ -739,8 +740,10 @@ main {
 .sale-line {
   display: flex;
   align-items: center;
+  /* keep this at 10px: 12 stole enough width from the name column to wrap
+     ordinary product names onto a second line */
   gap: 10px;
-  padding: 12px 0;
+  padding: 14px 0;
   border-bottom: 1px solid var(--border);
 }
 .sale-line:last-child {
@@ -762,7 +765,8 @@ main {
 .sale-line-meta {
   font-size: 12px;
   color: var(--text-secondary);
-  margin-top: 2px;
+  line-height: 1.45;
+  margin-top: 3px;
 }
 .sale-line-meta .saved {
   color: var(--success);
@@ -819,7 +823,7 @@ main {
 .line-actions {
   display: flex;
   gap: 6px;
-  margin-top: 6px;
+  margin-top: 8px;
 }
 .mini-btn {
   background: var(--surface-2);
@@ -1057,7 +1061,7 @@ main {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 0;
+  padding: 14px 0;
   border-bottom: 1px solid var(--border);
 }
 .list-row:last-child {
@@ -1076,8 +1080,8 @@ main {
 .move-col {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  margin-left: 8px;
+  gap: 4px;
+  margin-left: 12px;
   flex-shrink: 0;
 }
 .move-btn {
@@ -1129,7 +1133,8 @@ main {
 .list-sub {
   font-size: 12px;
   color: var(--text-secondary);
-  margin-top: 2px;
+  line-height: 1.45;
+  margin-top: 3px;
 }
 .list-end {
   text-align: right;
