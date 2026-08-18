@@ -555,6 +555,7 @@ main {
   font-size: 11px;
   color: var(--text-secondary);
   text-align: right;
+  white-space: nowrap;
 }
 .item-stock.low {
   color: var(--danger);
@@ -1069,11 +1070,34 @@ main {
 }
 /* add-on pricing state on a selling tile: live vs waiting for a main item */
 .item-bundle.addon-live {
-  color: var(--success);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.addon-pill {
+  color: var(--on-accent);
+  background: var(--success);
   font-weight: 700;
+  padding: 2px 7px;
+  border-radius: var(--r-pill);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
 }
 .item-bundle.addon-idle {
   color: var(--text-muted);
+}
+/* the add-on price is what is actually charged, so it gets the big number */
+.item-price.is-addon {
+  color: var(--success);
+}
+.price-was {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-decoration: line-through;
+  margin-left: 5px;
+  letter-spacing: 0;
 }
 
 /* reorder controls on stock rows — this order is the front grid's order */

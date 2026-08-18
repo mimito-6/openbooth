@@ -101,7 +101,7 @@
       const addon = OB.pricing.isAddon(p);
       const addonLive = addon && OB.pricing.cartQualifiesForAddon(st, cart);
       const bundle = addon
-        ? (addonLive ? "＋" + fmtMoney(p.addonPrice) : t("addon_needs_main"))
+        ? (addonLive ? t("addon_applied") : t("addon_idle", { price: fmtMoney(p.addonPrice) }))
         : (p.bundleRules && p.bundleRules[0]) ? p.bundleRules[0].label || p.bundleRules[0].qty + "→" + p.bundleRules[0].price : "";
       const card = el("div", {
         class: "item-card" + (inCart ? " has-qty" : "") + (soldOut ? " sold-out" : ""),
@@ -111,14 +111,29 @@
       if (inCart) card.appendChild(el("span", { class: "qty-badge", text: inCart }));
       if (p.image) card.appendChild(el("img", { class: "item-thumb", src: p.image, alt: "" }));
       card.appendChild(el("div", { class: "item-name", text: p.name }));
-      card.appendChild(
-        bundle
-          ? el("div", { class: "item-bundle" + (addon ? (addonLive ? " addon-live" : " addon-idle") : ""), text: bundle })
-          : el("div", { class: "item-bundle" })
-      );
-      const bottom = el("div", { class: "item-bottom" }, [
-        el("div", { class: "item-price", html: esc(fmtMoney(p.price)) }),
-      ]);
+      // The struck-through list price rides on the note line, not next to the
+      // big price — putting both numbers in the bottom row squeezed the stock
+      // count onto a second line.
+      let noteNode;
+      if (addonLive) {
+        noteNode = el("div", { class: "item-bundle addon-live" }, [
+          el("span", { class: "addon-pill", text: t("addon_applied") }),
+          el("span", { class: "price-was", text: fmtMoney(p.price) }),
+        ]);
+      } else if (bundle) {
+        noteNode = el("div", { class: "item-bundle" + (addon ? " addon-idle" : ""), text: bundle });
+      } else {
+        noteNode = el("div", { class: "item-bundle" });
+      }
+      card.appendChild(noteNode);
+      // While the add-on price is live it IS what the customer pays, so it
+      // takes the big number. Showing the list price large while charging less
+      // made sellers quote the wrong figure.
+      const priceNode = el("div", {
+        class: "item-price" + (addonLive ? " is-addon" : ""),
+        html: esc(fmtMoney(addonLive ? p.addonPrice : p.price)),
+      });
+      const bottom = el("div", { class: "item-bottom" }, [priceNode]);
       if (st.settings.showStock && isFinite(rem)) {
         bottom.appendChild(el("div", { class: "item-stock" + (low ? " low" : ""), text: t("remain", { n: Math.max(0, remAfter) }) }));
       }
@@ -426,8 +441,17 @@
       }
       s.lines.forEach((L) => {
         const meta = el("div", { class: "sale-line-meta" });
-        meta.appendChild(document.createTextNode(fmtMoney(L.basePrice) + " × " + L.qty));
-        if (L.bundleNote) meta.appendChild(el("span", { class: "saved", text: " · " + L.bundleNote }));
+        // show what is actually being charged per unit; the list price only
+        // survives as a struck-through reference when they differ
+        const discounted = !L.isTokuten && L.unitPrice !== L.basePrice;
+        if (discounted) {
+          meta.appendChild(el("span", { class: "price-was", style: "margin:0 4px 0 0", text: fmtMoney(L.basePrice) }));
+        }
+        meta.appendChild(document.createTextNode(fmtMoney(discounted ? L.unitPrice : L.basePrice) + " × " + L.qty));
+        // when every unit took the add-on price the struck-through original
+        // already says so — repeating it just wrapped the line
+        const fullyAddon = L.addonQty && L.addonQty === L.qty;
+        if (L.bundleNote && !fullyAddon) meta.appendChild(el("span", { class: "saved", text: " · " + L.bundleNote }));
 
         const nameEl = el("div", { class: "sale-line-name" }, [document.createTextNode(L.name)]);
         if (L.isTokuten) nameEl.appendChild(el("span", { class: "tag tag-tokuten", text: t("mark_tokuten") }));
