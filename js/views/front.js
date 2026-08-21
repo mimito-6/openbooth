@@ -37,7 +37,7 @@
     view.appendChild(tabBar);
 
     // search
-    const searchWrap = el("div", { style: "padding:0 16px 8px" }, [
+    const searchWrap = el("div", { class: "search-wrap", style: "padding:0 16px 8px" }, [
       el("div", { class: "search-box" }, [
         el("input", {
           type: "search",

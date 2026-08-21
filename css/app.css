@@ -1570,26 +1570,194 @@ main {
   font-size: 22px;
 }
 
-/* ===== Desktop / tablet ===== */
+/* ============================================================
+   Tablet & desktop
+   Everything above this point is mobile-first. From 600px up the app stops
+   stretching and becomes a centred column. --content is the single source of
+   truth for that column's width: anything that is full-bleed on a phone (the
+   search field, the fixed sale bar, the home blocks) has to opt into it or its
+   left edge sits proud of everything else.
+   ============================================================ */
+:root {
+  --content: 100%;
+}
 @media (min-width: 600px) {
-  .item-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  main {
-    max-width: 720px;
-    margin: 0 auto;
-  }
-  .header {
-    max-width: 720px;
-    margin: 0 auto;
-  }
-  .tab-bar {
-    max-width: 720px;
-    margin: 0 auto;
+  :root {
+    --content: 720px;
   }
 }
-@media (min-width: 920px) {
+@media (min-width: 900px) {
+  :root {
+    --content: 860px;
+  }
+}
+@media (min-width: 1100px) {
+  :root {
+    --content: 1000px;
+  }
+}
+@media (min-width: 1400px) {
+  :root {
+    --content: 1140px;
+  }
+}
+
+@media (min-width: 600px) {
+  .header,
+  .tab-bar,
+  .search-wrap,
+  main {
+    max-width: var(--content);
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* A phone shows two big tiles because that is all that fits. A tablet has
+     the room for a real shelf — more products per screen beats poster-sized
+     photos, since the whole job is finding an item fast mid-queue. */
+  .item-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  /* The sale bar is position:fixed, so it centres with a transform rather
+     than auto margins — and every transform state has to carry the centring
+     or it jumps to the left edge when it shows. */
+  .sale-bar {
+    left: 50%;
+    right: auto;
+    width: calc(var(--content) - 32px);
+    max-width: calc(100vw - 32px);
+    transform: translate(-50%, 160%);
+  }
+  .sale-bar.show {
+    transform: translate(-50%, 0);
+  }
+  .sale-bar:active {
+    transform: translate(-50%, 0) scale(0.99);
+  }
+
+  /* Home column: the CTA, the stats row and the nav grid were 520 / 528 / 560
+     wide. On a phone they all fill the screen so it never showed; side by side
+     on a tablet the ragged left edges are obvious. */
+  .open-stall-btn {
+    max-width: 528px;
+  }
+
+  /* A full-bleed bottom sheet on a tablet is mostly empty panel, and the
+     content sits miles from where the eye is. Become a centred dialog. */
+  .sheet {
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    top: 50%;
+    width: min(600px, calc(100% - 64px));
+    max-height: min(84vh, 820px);
+    transform: translate(-50%, -46%);
+    opacity: 0;
+    transition: transform 0.26s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.2s ease;
+  }
+  .sheet.open {
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
+  .sheet.tall {
+    height: auto; /* 90vh was for a bottom sheet; a dialog sizes to content */
+  }
+  /* nothing to drag on a centred dialog */
+  .sheet-handle {
+    display: none;
+  }
+  /* Themes style the sheet as a bottom sheet (top-only corners, a top border)
+     and they load after this file, so plain .sheet loses the cascade. Two
+     classes plus an element beats [data-theme="x"] .sheet. */
+  body .sheet.sheet {
+    border-radius: var(--r-xl);
+    border-top-width: 0;
+  }
+
+  /* A tablet propped facing the customer IS the customer display — give the
+     figure the room the screen actually has. */
+  .cfd .cfd-amount {
+    font-size: 104px;
+  }
+  .cfd .cfd-qr {
+    width: 300px;
+    height: 300px;
+  }
+}
+
+@media (min-width: 700px) {
   .item-grid {
     grid-template-columns: repeat(4, 1fr);
+  }
+}
+@media (min-width: 1100px) {
+  .item-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+@media (min-width: 1500px) {
+  .item-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+/* Only the product grid wants the full column. A list row stretched to 1000px
+   puts the name at the far left, the price at the far right and an acre of
+   nothing between, so every list-based view reads at a saner measure. */
+@media (min-width: 900px) {
+  main:not(:has(.item-grid)) {
+    max-width: 760px;
+  }
+}
+
+/* A landscape tablet is wide but short, and product photos are square, so
+   tiles are tall and only about two rows clear the fold. The image aspect is
+   the seller's chosen crop and must not be squashed — take a column instead.
+   Narrower tiles are shorter tiles. */
+@media (min-width: 900px) and (max-height: 820px) {
+  .item-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+@media (min-width: 1300px) and (max-height: 820px) {
+  .item-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+/* Landscape tablets: plenty of width, very little height. Claw back the
+   vertical padding so the grid and the checkout still fit without scrolling. */
+@media (min-width: 700px) and (max-height: 600px) {
+  .home-hero {
+    padding: 10px 20px 4px;
+  }
+  .home-mascot,
+  .home-mascot-fallback svg {
+    width: 54px;
+    height: 54px;
+  }
+  .home-shop-name {
+    font-size: 19px;
+  }
+  .open-stall-btn {
+    padding: 14px;
+    font-size: 17px;
+    margin: 10px auto 6px;
+  }
+  .stats {
+    margin-top: 10px;
+  }
+  .sheet {
+    max-height: 94vh;
+  }
+  .cfd .cfd-amount {
+    font-size: 72px;
+    margin: 4px 0 12px;
+  }
+  .cfd .cfd-qr {
+    width: 180px;
+    height: 180px;
   }
 }
