@@ -1676,6 +1676,42 @@ main {
     border-top-width: 0;
   }
 
+  /* A tablet is held further from the eye than a phone and driven with a whole
+     hand, and it has the room — so the tile grows rather than just multiplying.
+     Without this the card came out 162px against a phone's 158px: more of them
+     per row, but no easier to read or hit. */
+  .item-name {
+    font-size: 15.5px;
+  }
+  .item-price {
+    font-size: 21px;
+  }
+  .item-stock,
+  .item-bundle {
+    font-size: 12px;
+  }
+  .item-card {
+    padding: 14px 14px 16px;
+    min-height: 130px;
+  }
+  .qty-badge {
+    min-width: 28px;
+    height: 28px;
+    font-size: 14px;
+    top: 8px;
+    right: 8px;
+  }
+  .tab {
+    padding: 10px 18px;
+    font-size: 15px;
+  }
+  .sale-bar {
+    padding: 16px 22px;
+  }
+  .sale-bar-total {
+    font-size: 25px;
+  }
+
   /* A tablet propped facing the customer IS the customer display — give the
      figure the room the screen actually has. */
   .cfd .cfd-amount {
@@ -1687,19 +1723,14 @@ main {
   }
 }
 
-@media (min-width: 700px) {
+@media (min-width: 900px) {
   .item-grid {
     grid-template-columns: repeat(4, 1fr);
   }
 }
-@media (min-width: 1100px) {
+@media (min-width: 1400px) {
   .item-grid {
     grid-template-columns: repeat(5, 1fr);
-  }
-}
-@media (min-width: 1500px) {
-  .item-grid {
-    grid-template-columns: repeat(6, 1fr);
   }
 }
 
@@ -1716,12 +1747,12 @@ main {
    tiles are tall and only about two rows clear the fold. The image aspect is
    the seller's chosen crop and must not be squashed — take a column instead.
    Narrower tiles are shorter tiles. */
-@media (min-width: 900px) and (max-height: 820px) {
+@media (min-width: 900px) and (max-height: 700px) {
   .item-grid {
     grid-template-columns: repeat(5, 1fr);
   }
 }
-@media (min-width: 1300px) and (max-height: 820px) {
+@media (min-width: 1300px) and (max-height: 700px) {
   .item-grid {
     grid-template-columns: repeat(6, 1fr);
   }
